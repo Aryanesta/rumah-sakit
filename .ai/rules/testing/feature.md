@@ -1,0 +1,29 @@
+# Feature Tests
+
+**Purpose:** the default test type. Exercise the full stack through its real entry points — HTTP, Livewire, console, queue — against a real (test) database. They catch the largest class of regressions for the least test code.
+
+> Refines `testing.md` for this directory. How to write tests (datasets, fakes, Sanctum, assertions) lives in the parent. Structural rules → `architecture.md`. Isolated pure logic → `unit.md`.
+
+## What belongs here
+
+- HTTP endpoints — status, redirect, validation, and **authorization boundaries** (every route exposed to users).
+- Livewire / Filament components — mounting, actions, state, authorization.
+- Console commands — invoked via `$this->artisan(...)`.
+- Jobs / listeners / notifications exercised end-to-end (dispatched, then asserted via fakes or persisted effects).
+- Policies through the HTTP layer (prefer this over isolated policy unit tests — it proves the route is actually guarded).
+
+## Rules
+
+- **MUST** be the default. Reach for a Unit test only for genuinely isolated logic (see `unit.md`); reach for an arch test only for structure.
+- **MUST** mirror the app's domain sub-namespacing in the path — a test for `App\Http\Controllers\Billing\InvoiceController` lives at `tests/Feature/Billing/InvoiceControllerTest.php`. See `../core/app.md`.
+- **MUST** rely on the database refresh trait wired in `tests/Pest.php` (`RefreshDatabase` / `LazilyRefreshDatabase`) so each test starts from a clean schema — don't re-`use` it per file.
+- **MUST** assert behaviour and outcomes — persisted data, validation errors, redirects, dispatched jobs/notifications, side effects, record-level scoping/authorization. **MUST NOT** assert on presentation (layout, copy, labels, nav, element order, CSS classes); those are change-detectors.
+- **MUST** test both the allow **and** deny paths of every authorization boundary — a test that only proves the happy path leaves the lock untested.
+- **SHOULD** cover, per endpoint: happy path, validation failure, authorization failure, and one edge case per branch.
+- **AVOID** mocking your own application classes — exercise them for real and mock only external boundaries (see parent for `Mail::fake` / `Http::fake` / Sanctum abilities / shape assertions).
+
+## Create
+
+```bash
+php artisan make:test Billing/InvoiceControllerTest
+```
