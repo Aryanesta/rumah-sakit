@@ -4,8 +4,8 @@
 | | |
 |---|---|
 | **Proyek** | Ekosistem Digital Pelayanan Bedah & Keperawatan (Surgicon, Angsmart, ANSafe) |
-| **Status Dokumen** | Draft v3 — Komprehensif |
-| **Tanggal** | 24 September 2026 |
+| **Status Dokumen** | Draft v4 — Terintegrasi Fitur Pasien & Monitoring Surgicon |
+| **Tanggal** | 25 September 2026 |
 | **Disusun untuk** | Tim Produk & Pengembang PK Kesehatan |
 
 ---
@@ -17,7 +17,7 @@
 4. Target Pengguna & Persona
 5. Landing Page (Informasi Publik)
 6. Spesifikasi Fitur Utama
-   - 6.1 Surgicon
+   - 6.1 Surgicon (Perawat & Pasien)
    - 6.2 Angsmart
    - 6.3 ANSafe
 7. Hak Akses Pengguna (RBAC)
@@ -38,32 +38,35 @@
 
 Dokumen ini menjabarkan kebutuhan produk untuk tiga aplikasi yang saling terintegrasi di lingkungan pelayanan kesehatan:
 
-- **Surgicon** — manajemen alur bedah (Pre-OP, Intra-OP, Post-OP) beserta checklist keselamatan.
+- **Surgicon** — manajemen alur bedah (Pre-OP, Intra-OP, Post-OP) yang mendukung 2 aktor utama: **Perawat** (Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien) dan **Pasien** (Persiapan Sebelum Operasi & Persiapan Pasca Operasi berbasis Guide dan Checklist Membaca).
 - **Angsmart** — asuhan keperawatan, diagnosa keperawatan, rencana keperawatan, dan handover antar shift.
 - **ANSafe** — asesmen risiko jatuh pasien (Morse Fall Scale) dan pusat edukasi keselamatan pasien.
 
 Ketiganya berbagi **satu Master Data Pasien** sehingga data mengalir dari proses pra-bedah hingga asuhan rawat inap tanpa input ulang. Selain tiga modul aplikasi, proyek ini juga mencakup **Landing Page** publik sebagai pintu masuk informasi rumah sakit/klinik dan katalog edukasi.
 
-Tujuan akhir: mengurangi kesalahan prosedural, mempercepat serah terima (handover), dan memberi visibilitas real-time atas status pasien kepada seluruh tim medis.
+Tujuan akhir: mengurangi kesalahan prosedural, meningkatkan edukasi dan keterlibatan pasien secara mandiri, mempercepat serah terima (handover), dan memberi visibilitas real-time atas status pasien kepada seluruh tim medis.
 
 ---
 
 ## 2. Latar Belakang & Tujuan
 
 ### 2.1 Latar Belakang
-Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-operasi, intra-operasi, pasca-operasi, asuhan keperawatan rawat inap, hingga manajemen risiko keselamatan pasien. Proses manual (kertas, spreadsheet terpisah) rentan terhadap duplikasi data, keterlambatan informasi saat pergantian shift, dan sulit diaudit.
+Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-operasi, intra-operasi, pasca-operasi, asuhan keperawatan rawat inap, hingga manajemen risiko keselamatan pasien. Proses manual (kertas, spreadsheet terpisah) rentan terhadap duplikasi data, keterlambatan informasi saat pergantian shift, dan kurangnya pemahaman pasien atas prosedur pra dan pasca operasi.
 
 ### 2.2 Tujuan Produk
 1. Digitalisasi alur pendaftaran, rekam ringkas tindakan bedah, asuhan keperawatan, dan penilaian risiko pasien.
 2. Meminimalkan risiko kesalahan prosedur pembedahan melalui pemantauan Pre-OP dan Post-OP yang terpisah dan sekuensial.
-3. Mempercepat dan menstandardisasi proses *handover* (operan jaga) antar perawat dengan ringkasan data otomatis.
-4. Menyediakan pusat edukasi keselamatan pasien berbasis video yang mudah diakses pasien/keluarga.
-5. Memberikan visibilitas lintas modul (dashboard) bagi kepala ruangan/manajemen untuk pengambilan keputusan cepat.
+3. Memfasilitasi edukasi pra dan pasca bedah secara mandiri oleh pasien melalui panduan (*guide*) dan penandaan konfirmasi baca (*checklist*).
+4. Menyediakan fitur *Monitoring Akun Pasien* bagi perawat untuk memantau keterbacaan panduan oleh pasien secara real-time.
+5. Mempercepat dan menstandardisasi proses *handover* (operan jaga) antar perawat dengan ringkasan data otomatis.
+6. Menyediakan pusat edukasi keselamatan pasien berbasis video yang mudah diakses pasien/keluarga.
 
 ### 2.3 Masalah yang Dipecahkan
 | Masalah Saat Ini | Dampak | Solusi dalam Produk |
 |---|---|---|
-| Checklist Pre-OP/Post-OP manual di kertas | Rawan hilang, sulit diaudit | Checklist digital per halaman, tersimpan sebagai log |
+| Checklist Pre-OP/Post-OP manual di kertas | Rawan hilang, sulit diaudit | Checklist digital per halaman untuk perawat & log keterbacaan pasien |
+| Pasien kurang paham persiapan/pemulihan bedah | Komplikasi, risiko penundaan operasi | Modul Pasien berisi Guide & Checklist konfirmasi membaca |
+| Perawat tidak tahu pasien sudah baca panduan atau belum | Harus konfirmasi berulang kali secara lisan | Fitur *Monitoring Akun Pasien* dengan status real-time & indikator peringatan |
 | Data pasien diinput ulang di tiap unit | Duplikasi, inkonsistensi | Master Data Pasien + Foreign Key otomatis |
 | Handover lisan/tidak terdokumentasi | Informasi hilang antar shift | Fitur Handover dengan ringkasan otomatis + catatan terkunci |
 | Asesmen risiko jatuh manual & subjektif | Skor tidak konsisten | Form MFS dengan kalkulasi skor otomatis & badge risiko |
@@ -74,10 +77,12 @@ Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-op
 
 ### 3.1 Dalam Lingkup (In-Scope)
 - Landing page publik + katalog video edukasi.
-- Modul Surgicon: dashboard, list pasien, Pre-OP checklist, Post-OP checklist.
-- Modul Angsmart: dashboard, list pasien, asuhan keperawatan, handover, diagnosa keperawatan, rencana keperawatan.
-- Modul ANSafe: dashboard, list pasien & asesmen MFS, education center.
-- Sinkronisasi data pasien lintas modul (Foreign Key / Master Data).
+- **Modul Surgicon (2 Aktor)**:
+  - *Aktor Pasien*: Portal akses panduan & checklist persiapan sebelum operasi (Pre-OP) dan pasca operasi (Post-OP).
+  - *Aktor Perawat*: Beranda (Dashboard), List Pasien, Verifikasi Sebelum Operasi (Pre-OP Checklist), Verifikasi Pasca Bedah (Post-OP Checklist), dan Monitoring Akun Pasien.
+- **Modul Angsmart**: dashboard, list pasien, asuhan keperawatan, handover, diagnosa keperawatan, rencana keperawatan.
+- **Modul ANSafe**: dashboard, list pasien & asesmen MFS, education center.
+- **Sinkronisasi Data**: Master Data Pasien terpusat yang terhubung lintas modul.
 
 ### 3.2 Di Luar Lingkup (Out-of-Scope) — untuk fase ini
 - Integrasi penuh dengan SIMRS/BPJS/klaim asuransi.
@@ -85,19 +90,17 @@ Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-op
 - Aplikasi mobile native (versi awal berbasis web responsif).
 - Rekam medis elektronik (RME) lengkap di luar cakupan tiga modul di atas.
 
-> Catatan: item di luar lingkup dapat menjadi bahan diskusi roadmap Fase 2 (lihat Bab 15).
-
 ---
 
 ## 4. Target Pengguna & Persona
 
 | Persona | Peran | Kebutuhan Utama |
 |---|---|---|
-| **Perawat Ruang OK (Bedah)** | Mengelola pasien di Surgicon | Input cepat, checklist jelas per fase, minim klik |
+| **Perawat Ruang OK (Surgicon Nurse)** | Mengelola verifikasi bedah & memantau akun pasien | Verifikasi cepat Pre-OP/Post-OP, memantau status checklist guide pasien secara real-time |
+| **Pasien Bedah (Surgicon Patient)** | Mengakses edukasi pra & pasca operasi mandiri | Antarmuka intuitif untuk membaca panduan operasi dan men-checklist konfirmasi membaca |
 | **Perawat Ruangan (Rawat Inap)** | Mengelola asuhan & handover di Angsmart | Ringkasan pasien cepat, form asuhan mudah diisi tiap shift |
 | **Perawat Penilai Risiko (ANSafe)** | Melakukan asesmen MFS berkala | Form skor otomatis, riwayat asesmen mudah dilihat |
 | **Kepala Ruangan / Supervisor** | Memantau seluruh unit | Dashboard ringkas, indikator risiko & status real-time |
-| **Pasien / Keluarga Pasien** | Mengakses edukasi | Video mudah dicari berdasarkan kategori |
 | **Admin/IT Rumah Sakit** | Mengelola master data & hak akses | RBAC, audit log, kemudahan maintenance |
 
 ---
@@ -105,59 +108,68 @@ Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-op
 ## 5. Landing Page (Informasi Publik)
 
 ### 5.1 Tujuan
-Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyediakan akses edukasi bagi pasien/keluarga, sekaligus pintu masuk (login) bagi staf medis.
+Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyediakan akses edukasi bagi pasien/keluarga, sekaligus pintu masuk (*login*) bagi staf medis maupun akses mandiri pasien.
 
 ### 5.2 Struktur & Komponen
 1. **Hero Section**
    - Headline: "Presisi, Keselamatan, dan Intelijen dalam Satu Ekosistem Medis."
    - Sub-headline: penjelasan singkat integrasi Surgicon, Angsmart, ANSafe.
-   - CTA: "Masuk ke Aplikasi" / "Lihat Edukasi Keselamatan".
+   - CTA: "Masuk Staf Medis" / "Portal Pasien" / "Lihat Edukasi Keselamatan".
 2. **Profil Pusat Kesehatan** — visi, misi, sejarah singkat, fasilitas penunjang.
 3. **Tiga Pilar Utama (Card Fitur)**
-   - Card Surgicon — ringkasan fungsi manajemen bedah.
+   - Card Surgicon — ringkasan fungsi manajemen bedah & edukasi pasien.
    - Card Angsmart — ringkasan fungsi asuhan keperawatan & handover.
    - Card ANSafe — ringkasan fungsi asesmen risiko jatuh.
 4. **Dokter & Tenaga Medis** — daftar dokter spesialis, jadwal praktik.
-5. **Education Hub (Publik)** — katalog video edukasi keselamatan (sinkron dengan Education Center ANSafe), difilter 4 kategori: Semua, Pasien, Keluarga, Tips Keselamatan.
+5. **Education Hub (Publik)** — katalog video edukasi keselamatan, difilter 4 kategori: Semua, Pasien, Keluarga, Tips Keselamatan.
 6. **Testimoni & Mitra** — ulasan dan kerja sama.
-7. **Footer** — kontak, alamat, tautan login staf, media sosial.
-
-### 5.3 Kebutuhan Fungsional Landing Page
-- Responsif (desktop, tablet, mobile).
-- Video edukasi dapat diputar langsung (embedded player) tanpa perlu login.
-- Tombol login terpisah untuk staf (mengarah ke portal Surgicon/Angsmart/ANSafe sesuai hak akses).
+7. **Footer** — kontak, alamat, tautan login, media sosial.
 
 ---
 
 ## 6. Spesifikasi Fitur Utama
 
-### 6.1 Modul Surgicon (Manajemen Pelayanan Bedah)
+### 6.1 Modul Surgicon (Manajemen Pelayanan Bedah & Edukasi Pasien)
 
+Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
+
+#### A. Aktor Perawat
 | ID | Fitur | Elemen UI | Deskripsi & Logika Bisnis | Acceptance Criteria |
 |---|---|---|---|---|
-| SURG-01 | Dashboard | Stat cards, tabel list pasien | Cards: Total Pasien, Pre-OP, Sedang OP, Post-OP. Tabel: Nama, No. RM, Jenis Tindakan, Fase OP | Angka pada card selalu sinkron real-time dengan status fase pasien |
-| SURG-02 | List Pasien | Tabel data, modal tambah pasien | Kolom: Nama, Umur, No. RM, Jenis Tindakan, Diagnosa, Fase OP, Aksi. Tambah pasien otomatis membuat record Foreign Key di tabel `asuhan_keperawatan` | Setelah simpan, record baru muncul di Angsmart tanpa input ulang |
-| SURG-03 | Pre-OP Checklist *(halaman terpisah)* | Tabel pasien Pre-OP, form checklist | Verifikasi pra-bedah: identitas, puasa, tanda vital, persetujuan tindakan, marka lokasi operasi, kesiapan alat | Semua item tercentang sebelum status pasien dapat berubah ke "Sedang OP" |
-| SURG-04 | Post-OP Checklist *(halaman terpisah)* | Tabel pasien Post-OP, form checklist | Verifikasi pasca-bedah: kondisi recovery room, instruksi pasca-operasi, kelengkapan spesimen, kondisi pasca-anestesi | Checklist harus lengkap sebelum pasien dapat dipindah ke ruang rawat inap |
+| SURG-01 | Beranda (Dashboard) | Stat cards, tabel ringkasan | Cards: Total Pasien, Pre-OP, Sedang OP, Post-OP, Pasien Sudah Baca Guide. Ringkasan status keterbacaan guide pasien. | Angka pada card sinkron real-time dengan status fase pasien & aktivitas pasien. |
+| SURG-02 | List Pasien | Tabel data, modal tambah pasien | Kolom: Nama, Umur, No. RM, Jenis Tindakan, Diagnosa, Fase OP, Status Guide Pasien, Aksi. Tambah pasien otomatis membuat record FK di `asuhan_keperawatan`. | Data tersimpan & terhubung ke modul Angsmart serta membuat kredensial portal pasien. |
+| SURG-03 | Verifikasi Sebelum Operasi (Pre-OP Checklist) | Tabel pasien Pre-OP, form verifikasi perawat | Verifikasi medis pra-bedah oleh perawat: identitas, puasa, tanda vital, persetujuan tindakan, marka lokasi operasi, kesiapan alat. | Semua item verifikasi terisi sebelum status berubah ke "Sedang OP". |
+| SURG-04 | Verifikasi Pasca Bedah (Post-OP Checklist) | Tabel pasien Post-OP, form verifikasi perawat | Verifikasi medis pasca-bedah oleh perawat: kondisi recovery room, instruksi pasca-operasi, kelengkapan spesimen, kondisi pasca-anestesi. | Checklist lengkap sebelum pasien dipindah ke ruang rawat inap. |
+| SURG-05 | Monitoring Akun Pasien | Tabel pemantauan status guide | Memantau seluruh akun pasien yang telah/belum men-checklist guide. Kolom: Nama, No. RM, Status Guide Pre-OP (Sudah/Belum + Tanggal/Waktu), Status Guide Post-OP (Sudah/Belum + Tanggal/Waktu), Badge Peringatan. | Tampilan pemantauan terbarui otomatis ketika pasien men-checklist guide. Menampilkan indikator jika guide belum dibaca mendekati jam operasi. |
+
+#### B. Aktor Pasien
+| ID | Fitur | Elemen UI | Deskripsi & Logika Bisnis | Acceptance Criteria |
+|---|---|---|---|---|
+| SURG-P01 | Persiapan Sebelum Operasi (Pre-OP Guide & Checklist) | Tampilan artikel/guide persiapan, Checkbox konfirmasi | Berisi panduan persiapan sebelum operasi (persyaratan puasa, kebersihan, dokumen). Pasien men-checklist konfirmasi *"Saya telah membaca dan memahami panduan ini"*. | Checkbox mengirimkan log *timestamp* dan memperbarui status pada menu Monitoring Akun Pasien milik perawat. |
+| SURG-P02 | Persiapan Pasca Operasi (Post-OP Guide & Checklist) | Tampilan artikel/guide pemulihan, Checkbox konfirmasi | Berisi panduan pemulihan pasca operasi (perawatan luka, aktivitas, manajemen nyeri). Pasien men-checklist konfirmasi membaca. | Checkbox mencatat *timestamp* dan memperbarui status pemantauan perawat. |
+
+---
 
 ### 6.2 Modul Angsmart (Asuhan & Handover Keperawatan)
 
 | ID | Fitur | Elemen UI | Deskripsi & Logika Bisnis | Acceptance Criteria |
 |---|---|---|---|---|
-| ANG-01 | Dashboard | Stat cards, pie chart, tabel | Cards: Total Pasien, Dalam Asuhan, Menunggu Tindakan, Perlu Handover. Pie chart: distribusi status asuhan. Tabel: Nama, No. RM, Kamar/Bed | Pie chart otomatis update saat status asuhan berubah |
-| ANG-02 | List Pasien | Tabel ringkas | Kolom: Nama, Umur, No. RM, Bed, Diagnosa, Jenis Tindakan, Status Asuhan, Aksi (Update) | Data pasien identik dengan Master Data (read-only untuk identitas dasar) |
-| ANG-03 | Asuhan Keperawatan | Tabel asuhan | Kolom: Nama, Daftar Tindakan, Shift, Tanggal Update, Catatan Pasien, Aksi | Setiap update tersimpan dengan timestamp & nama perawat pengisi |
-| ANG-04 | Fitur Handover | Select pasien, ringkasan dinamis, form catatan | Memilih pasien menampilkan agregasi data Pasien + Asuhan Keperawatan + kolom catatan tambahan handover | Tersedia tombol "Kunci/Finalisasi Handover" — setelah terkunci data menjadi log riwayat (read-only, teraudit) |
-| ANG-05 | Diagnosa Keperawatan | Tabel master diagnosa | Kolom: Diagnosa, Tujuan, Intervensi, Aksi (CRUD) — sebagai pustaka referensi | Dipakai sebagai dropdown pencarian di fitur Rencana Keperawatan |
-| ANG-06 | Rencana Keperawatan | Tabel rencana | Kolom: Nama Pasien, Diagnosa Perawat, Status, Tanggal Update, Aksi | Memilih diagnosa dari master (ANG-05) otomatis mengisi Tujuan & Intervensi |
+| ANG-01 | Dashboard | Stat cards, pie chart, tabel | Cards: Total Pasien, Dalam Asuhan, Menunggu Tindakan, Perlu Handover. Pie chart: distribusi status asuhan. | Pie chart otomatis update saat status asuhan berubah. |
+| ANG-02 | List Pasien | Tabel ringkas | Kolom: Nama, Umur, No. RM, Bed, Diagnosa, Jenis Tindakan, Status Asuhan, Aksi. | Data pasien read-only dari Master Data Pasien. |
+| ANG-03 | Asuhan Keperawatan | Tabel asuhan | Kolom: Nama, Daftar Tindakan, Shift, Tanggal Update, Catatan Pasien, Aksi. | Tersimpan dengan timestamp & nama perawat pengisi. |
+| ANG-04 | Fitur Handover | Select pasien, ringkasan dinamis, form catatan | Agregasi data Pasien + Asuhan Keperawatan + catatan tambahan handover. | Tombol "Kunci/Finalisasi Handover" mengubah data menjadi log riwayat read-only. |
+| ANG-05 | Diagnosa Keperawatan | Tabel master diagnosa | CRUD Diagnosa, Tujuan, Intervensi sebagai pustaka referensi. | Digunakan sebagai pencarian di Rencana Keperawatan. |
+| ANG-06 | Rencana Keperawatan | Tabel rencana | Memilih diagnosa master otomatis mengisi Tujuan & Intervensi. | Form terisi otomatis sesuai referensi master. |
+
+---
 
 ### 6.3 Modul ANSafe (Asesmen Keselamatan & Risiko Jatuh)
 
 | ID | Fitur | Elemen UI | Deskripsi & Logika Bisnis | Acceptance Criteria |
 |---|---|---|---|---|
-| ANS-01 | Dashboard | Stat cards, tabel monitoring | Cards: Total Pasien, Risiko Rendah, Sedang, Tinggi. Tabel: Nama, No. RM, Bed, Tingkat Risiko, Asesmen Terakhir (tanggal & waktu) | Badge warna risiko konsisten di seluruh modul (merah/kuning/hijau) |
-| ANS-02 | List Pasien & Asesmen MFS | Tabel pasien, form radio button MFS | Form Morse Fall Scale via select pasien → radio button per indikator → skor dijumlahkan otomatis | Skor 0–24 = Rendah, 25–44 = Sedang, ≥45 = Tinggi (dihitung otomatis, tidak bisa diedit manual) |
-| ANS-03 | Education Center | Filter kategori, grid video | 4 kategori: Semua, Pasien, Keluarga, Tips Keselamatan | Filter berfungsi tanpa reload halaman penuh |
+| ANS-01 | Dashboard | Stat cards, tabel monitoring | Cards: Total Pasien, Risiko Rendah, Sedang, Tinggi. Tabel data asesmen. | Badge warna risiko konsisten di seluruh modul. |
+| ANS-02 | List Pasien & Asesmen MFS | Tabel pasien, form radio button MFS | Form Morse Fall Scale → kalkulasi skor otomatis. | Skor 0–24 = Rendah, 25–44 = Sedang, ≥45 = Tinggi. Dihitung otomatis. |
+| ANS-03 | Education Center | Filter kategori, grid video | 4 kategori: Semua, Pasien, Keluarga, Tips Keselamatan. | Filter berfungsi tanpa reload halaman. |
 
 ---
 
@@ -165,61 +177,42 @@ Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyed
 
 | Peran | Surgicon | Angsmart | ANSafe | Landing Page (Admin) |
 |---|---|---|---|---|
-| Perawat OK/Bedah | Full akses (CRUD pasien, checklist) | Lihat saja | Lihat saja | — |
-| Perawat Ruangan | Lihat saja | Full akses (asuhan, handover, rencana) | Lihat & isi asesmen | — |
-| Kepala Ruangan | Lihat semua dashboard | Lihat semua dashboard | Lihat semua dashboard | Lihat laporan |
+| **Perawat Surgicon** | Full Akses (Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien) | Lihat saja | Lihat saja | — |
+| **Pasien** | Akses Portal Pasien (Persiapan Pre-OP Guide & Checklist, Persiapan Post-OP Guide & Checklist) | — | — | Lihat konten publik |
+| **Perawat Ruangan** | Lihat saja | Full akses (asuhan, handover, rencana) | Lihat & isi asesmen | — |
+| **Kepala Ruangan** | Lihat semua dashboard | Lihat semua dashboard | Lihat semua dashboard | Lihat laporan |
 | Admin/IT | Kelola user & master data | Kelola user & master data | Kelola user & master data | Full akses |
-| Pasien/Keluarga | — | — | Education Center (publik) | Lihat konten publik |
-
-> Rekomendasi: gunakan satu sistem SSO/login terpadu agar staf tidak perlu login berulang ke tiap modul.
 
 ---
 
 ## 8. Alur Pengguna (User Flow)
 
-### 8.1 Flow Global
+### 8.1 Flow Surgicon - Perawat
 ```
-[ Landing Page ] → [ Login Staf ] → [ Dashboard Utama ]
-                                          │
-        ┌─────────────────────────────────┼─────────────────────────────────┐
-        ▼                                 ▼                                 ▼
-  [ SURGICON ]                     [ ANGSMART ]                       [ ANSAFE ]
-```
-
-### 8.2 Flow Surgicon
-```
-Dashboard Surgicon
-  └─ List Pasien
-       └─ Tambah Pasien → (auto-create FK ke Asuhan Keperawatan)
-  └─ Halaman Pre-OP Checklist (terpisah)
-       └─ Pilih pasien → centang tahapan persiapan bedah
-  └─ Halaman Post-OP Checklist (terpisah)
-       └─ Pilih pasien → centang tahapan pemulihan pasca-bedah
+[ Login Perawat ] → [ Beranda Surgicon ]
+                         │
+        ┌────────────────┼────────────────┬────────────────┐
+        ▼                ▼                ▼                ▼
+  [ List Pasien ]  [ Verifikasi ]   [ Verifikasi ]   [ Monitoring ]
+  (Tambah Pasien)    (Pre-OP)         (Post-OP)     (Akun Pasien)
 ```
 
-### 8.3 Flow Angsmart
+### 8.2 Flow Surgicon - Pasien
 ```
-Dashboard Angsmart
-  └─ List Pasien → update status asuhan
-  └─ Asuhan Keperawatan → isi tindakan, shift, catatan
-  └─ Diagnosa Keperawatan → kelola master (CRUD)
-  └─ Rencana Keperawatan → pilih diagnosa dari master → auto-isi tujuan/intervensi
-  └─ Handover
-       └─ Pilih pasien (select box)
-       └─ Sistem tampilkan ringkasan gabungan (Pasien + Asuhan)
-       └─ Isi catatan tambahan → Kunci/Finalisasi → tersimpan sebagai log
+[ Akses Portal Pasien ] (Login No. RM / Token)
+         │
+         ├─► [ Persiapan Sebelum Operasi ] ─► Baca Guide ─► Centang Checklist
+         │                                                      │
+         └─► [ Persiapan Pasca Operasi ]   ─► Baca Guide ─► Centang Checklist
+                                                                │
+                                                                ▼
+                                                 (Kirim Log Real-Time ke Perawat)
 ```
 
-### 8.4 Flow ANSafe
+### 8.3 Flow Angsmart & ANSafe
 ```
-Dashboard ANSafe
-  └─ List Pasien & Asesmen
-       └─ Pilih pasien → isi form MFS (radio button)
-       └─ Sistem hitung skor otomatis → tentukan kategori risiko
-       └─ Badge & dashboard ter-update otomatis
-  └─ Education Center
-       └─ Filter kategori (Semua/Pasien/Keluarga/Tips Keselamatan)
-       └─ Putar video edukasi
+[ Login Staf ] ──► [ Dashboard Angsmart ] ──► Asuhan / Handover / Rencana
+               └──► [ Dashboard ANSafe ]   ──► Asesmen MFS / Education Center
 ```
 
 ---
@@ -227,23 +220,22 @@ Dashboard ANSafe
 ## 9. Skema Data & Relasi Antar Modul (Konsep ERD)
 
 ### 9.1 Entitas Utama
-- **Pasien** *(Master Data)* — id, nama, umur, no. RM, kamar/bed, diagnosa, jenis tindakan.
-- **Asuhan Keperawatan** — pasien_id (FK), daftar tindakan, shift, tanggal update, catatan.
-- **Handover Log** — pasien_id (FK), ringkasan gabungan, catatan shift, status kunci, timestamp, perawat pengisi.
+- **Pasien** *(Master Data)* — id, nama, umur, no_rm, kamar_bed, diagnosa, jenis_tindakan, kode_akses_pasien.
+- **Patient_Guide_Log** *(Baru)* — id, pasien_id (FK), guide_type ('PRE_OP' / 'POST_OP'), is_read (Boolean), read_at (Timestamp).
+- **Verifikasi_PreOP_Nurse** — id, pasien_id (FK), perawat_id (FK), items_checked (JSON), status, timestamp.
+- **Verifikasi_PostOP_Nurse** — id, pasien_id (FK), perawat_id (FK), items_checked (JSON), status, timestamp.
+- **Asuhan Keperawatan** — pasien_id (FK), daftar_tindakan, shift, tanggal_update, catatan.
+- **Handover Log** — pasien_id (FK), ringkasan_gabungan, catatan_shift, status_kunci, timestamp, perawat_id.
 - **Diagnosa Keperawatan (Master)** — id, diagnosa, tujuan, intervensi.
-- **Rencana Keperawatan** — pasien_id (FK), diagnosa_id (FK ke master), status, tanggal update.
-- **Checklist Pre-OP / Post-OP** — pasien_id (FK), daftar item checklist, status per item, timestamp.
-- **Asesmen MFS** — pasien_id (FK), jawaban per indikator, skor total, kategori risiko, timestamp, perawat penilai.
-- **Video Edukasi** — id, judul, kategori, url/embed, durasi.
+- **Rencana Keperawatan** — pasien_id (FK), diagnosa_id (FK), status, tanggal_update.
+- **Asesmen MFS** — pasien_id (FK), jawaban_indikator (JSON), skor_total, kategori_risiko, timestamp.
+- **Video Edukasi** — id, judul, kategori, url_embed, durasi.
 
 ### 9.2 Relasi Kunci
-- `Pasien (1) — (N) Asuhan Keperawatan` (dibuat otomatis saat pasien ditambahkan di Surgicon).
-- `Pasien (1) — (N) Checklist Pre-OP/Post-OP`.
-- `Pasien (1) — (N) Asesmen MFS` (riwayat asesmen dari waktu ke waktu, bukan overwrite).
-- `Diagnosa Keperawatan (1) — (N) Rencana Keperawatan`.
-- `Pasien + Asuhan Keperawatan → Handover Log` (agregasi, bukan tabel FK langsung, tapi query gabungan saat handover dibuat).
-
-> Rekomendasi teknis: gunakan `pasien_id` sebagai kunci federasi tunggal di seluruh modul agar tidak terjadi data pasien ganda antar Surgicon/Angsmart/ANSafe.
+- `Pasien (1) — (N) Patient_Guide_Log` (Mencatat konfirmasi pembacaan panduan pra dan pasca operasi oleh pasien).
+- `Pasien (1) — (N) Verifikasi_PreOP_Nurse` & `Verifikasi_PostOP_Nurse`.
+- `Pasien (1) — (N) Asuhan Keperawatan` (Otomatis terbuat saat pasien baru ditambahkan).
+- `Pasien (1) — (N) Asesmen MFS`.
 
 ---
 
@@ -251,38 +243,28 @@ Dashboard ANSafe
 
 | Kategori | Kebutuhan |
 |---|---|
-| **Keamanan Data** | Data pasien adalah data sensitif — wajib enkripsi at-rest & in-transit, mematuhi regulasi perlindungan data pribadi yang berlaku (mis. UU PDP) |
-| **Audit Trail** | Setiap perubahan checklist, asesmen MFS, dan handover harus tercatat (siapa, kapan, apa yang diubah) dan tidak dapat dihapus |
-| **Performa** | Dashboard harus memuat data dalam <2 detik untuk hingga ~500 pasien aktif |
-| **Ketersediaan** | Target uptime 99.5% mengingat penggunaan di lingkungan klinis 24/7 |
-| **Kompatibilitas** | Responsif di desktop (nurse station) dan tablet (mobile bedside) |
-| **Skalabilitas** | Struktur data mendukung penambahan modul/rumah sakit baru tanpa migrasi besar |
-| **Aksesibilitas** | Kontras warna badge risiko harus tetap terbaca (color-blind friendly, gunakan ikon + warna) |
+| **Keamanan Data** | Enkripsi data sensitif (UU PDP). Otentikasi pasien menggunakan No. RM + Token / Tanggal Lahir. |
+| **Audit Trail** | Setiap checklist perawat dan konfirmasi baca pasien tercatat dengan timestamp presisi & ID pengguna. |
+| **Performa & Real-Time** | Monitoring Akun Pasien memperbarui status keterbacaan guide secara instan (< 2 detik) tanpa perlu reload halaman penuh. |
+| **Kompatibilitas Tampilan** | Portal pasien sangat responsif untuk layar smartphone/tablet; portal perawat optimal untuk Nurse Station (desktop/tablet). |
+| **Aksesibilitas Pasien** | Tampilan panduan pasien menggunakan font berukuran jelas, kontras memadai, dan petunjuk langkah demi langkah yang mudah dipahami orang awam. |
 
 ---
 
 ## 11. Catatan Logika & Arsitektur Teknis
 
-1. **Pemisahan Pre-OP & Post-OP Checklist**
-   Dipisah menjadi dua halaman agar validasi tahap operasi berjalan sekuensial dan mengurangi kebingungan petugas di lapangan. Status pasien tidak bisa "lompat fase" tanpa checklist fase sebelumnya lengkap.
+1. **Logika Monitoring Keterbacaan Guide**:
+   Ketika pasien mencentang checkbox *"Saya telah membaca dan memahami panduan ini"* pada modul Pre-OP atau Post-OP Guide, sistem akan menyimpan log ke tabel `Patient_Guide_Log`. Fitur *Monitoring Akun Pasien* di portal perawat menarik data log ini untuk menampilkan badge hijau "Sudah Dibaca" beserta jam & tanggalnya.
 
-2. **Sinkronisasi Data Pasien Bedah & Keperawatan**
-   Saat pasien baru ditambahkan di Surgicon, sistem otomatis membuat record kosong di `asuhan_keperawatan` via `pasien_id` (Foreign Key), menjamin *continuity of care* tanpa input ulang identitas.
+2. **Indikator Peringatan (Alert Badge)**:
+   Jika status Pre-OP guide pasien masih "Belum Dibaca" saat jam tindakan operasi kurang dari 2 jam, tabel *Monitoring Akun Pasien* dan *Beranda Perawat* akan menampilkan badge peringatan berwarna kuning/merah.
 
-3. **Sinkronisasi Skor MFS ke Modul Lain**
-   Skor & kategori risiko dari ANSafe sebaiknya tampil sebagai badge di list pasien Angsmart dan Surgicon, agar tim medis selalu waspada terhadap pasien berisiko tinggi meski sedang bekerja di modul lain.
+3. **Pemisahan Verifikasi Perawat & Checklist Pasien**:
+   - Checklist Pasien berfokus pada edukasi dan pemahaman mandiri.
+   - Verifikasi Perawat (Pre-OP & Post-OP) berfokus pada persetujuan medis, pemeriksaan fisik, kesiapan alat, dan keselamatan klinis.
 
-4. **Mekanisme Kunci Handover**
-   Setelah "Kunci/Finalisasi Handover" ditekan, data menjadi read-only dan tersimpan sebagai log riwayat beraudit — mencegah manipulasi laporan shift setelah serah terima selesai.
-
-5. **Perhitungan Otomatis MFS**
-   Setiap radio button memiliki bobot skor. Total dihitung real-time di sisi client sebelum submit ke server, lalu divalidasi ulang di server-side untuk mencegah manipulasi skor dari front-end:
-   - Skor 0–24 → Risiko Rendah
-   - Skor 25–44 → Risiko Sedang
-   - Skor ≥45 → Risiko Tinggi
-
-6. **Master Diagnosa Keperawatan sebagai Pustaka**
-   Fitur Rencana Keperawatan memanfaatkan dropdown/search dari master Diagnosa Keperawatan (Angsmart) untuk auto-isi Tujuan & Intervensi, mempercepat input data harian.
+4. **Integrasi Master Data**:
+   Penambahan pasien baru oleh perawat di Surgicon secara otomatis meregistrasikan ID pasien ke Master Data dan menyiapkan slot record di modul Angsmart dan ANSafe.
 
 ---
 
@@ -290,24 +272,23 @@ Dashboard ANSafe
 
 | Metrik | Target Awal |
 |---|---|
-| Waktu rata-rata pengisian checklist Pre-OP | < 3 menit per pasien |
-| Waktu proses handover per pasien | < 5 menit |
-| Kepatuhan pengisian asesmen MFS (setiap shift) | > 95% pasien rawat inap ter-asesmen |
-| Insiden pasien jatuh pasca-implementasi | Turun dibanding baseline sebelum sistem |
-| Adopsi Education Center oleh pasien/keluarga | > 50% pasien risiko sedang-tinggi mengakses video edukasi |
+| Kepatuhan Pasien Membaca Pre-OP Guide | > 85% pasien men-checklist guide sebelum tindakan bedah |
+| Respons Perawat terhadap Peringatan Pasien Belum Baca | < 15 menit setelah alert muncul di halaman Monitoring |
+| Waktu Rata-rata Verifikasi Pre-OP/Post-OP Perawat | < 3 menit per pasien |
+| Waktu Proses Handover Per Pasien | < 5 menit |
+| Kepatuhan Pengisian Asesmen MFS | > 95% pasien rawat inap ter-asesmen tiap shift |
 
 ---
 
 ## 13. Asumsi & Batasan
 
 **Asumsi:**
-- Setiap pasien hanya memiliki satu identitas aktif (no. RM unik) di Master Data.
-- Perawat memiliki perangkat (komputer/tablet) di titik layanan (point of care).
-- Koneksi internet/intranet rumah sakit stabil di seluruh unit terkait.
+- Pasien/keluarga pasien memiliki perangkat smartphone/tablet untuk mengakses portal panduan pasien.
+- Perawat memiliki akses komputer/tablet di titik layanan (nurse station / ruang pemulihan / OK).
 
 **Batasan:**
-- Fase awal belum terintegrasi dengan SIMRS/BPJS.
-- Video edukasi di-host di platform pihak ketiga (bukan self-hosted) pada fase MVP.
+- Otentikasi pasien versi MVP menggunakan kombinasi No. RM dan Tanggal Lahir / Token Akses Singkat tanpa pendaftaran akun rumit.
+- Materi panduan (guide) disimpan dalam bentuk konten teks interaktif, gambar, atau video embedded.
 
 ---
 
@@ -315,32 +296,31 @@ Dashboard ANSafe
 
 | Risiko | Dampak | Mitigasi |
 |---|---|---|
-| Duplikasi input pasien di lebih dari satu modul | Data pasien tidak konsisten | Terapkan Master Data terpusat + validasi no. RM unik |
-| Petugas lupa mengunci handover | Data bisa berubah setelah shift selesai | Reminder otomatis / auto-lock setelah jangka waktu tertentu |
-| Skor MFS dimanipulasi dari sisi client | Kategori risiko salah, membahayakan pasien | Validasi ulang perhitungan skor di server-side |
-| Resistensi perubahan dari staf (masih terbiasa manual) | Adopsi rendah | Pelatihan bertahap + UI yang meniru alur kerja existing |
+| Pasien tidak memiliki smartphone / tidak paham cara centang checklist | Status monitoring perawat tidak ter-update | Perawat dapat membantu memandu atau melakukan centang atas konfirmasi lisan pasien melalui modul perawat |
+| Pasien langsung men-checklist tanpa benar-benar membaca | Pemahaman pasien kurang | Buat tampilan guide interaktif dengan poin-poin ringkas & beri jeda waktu sebelum tombol checklist aktif |
+| Duplikasi data pasien antar modul | Data tidak konsisten | Validasi No. RM unik di seluruh ekosistem |
 
 ---
 
 ## 15. Roadmap Pengembangan
 
 ### Fase 1 — MVP (Prioritas Tinggi)
-- Landing page dasar + Education Hub.
-- Surgicon: Dashboard, List Pasien, Pre-OP & Post-OP Checklist.
+- Landing page + Login terpisah (Perawat/Staf & Akses Pasien).
+- Surgicon:
+  - Portal Perawat: Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien.
+  - Portal Pasien: Persiapan Pre-OP Guide & Checklist, Persiapan Post-OP Guide & Checklist.
 - Angsmart: Dashboard, List Pasien, Asuhan Keperawatan, Handover.
 - ANSafe: Dashboard, List Pasien & Asesmen MFS.
-- Master Data Pasien terpusat + sinkronisasi Foreign Key.
+- Master Data Pasien terpusat.
 
 ### Fase 2 — Penyempurnaan
-- Angsmart: Diagnosa Keperawatan (master) & Rencana Keperawatan.
-- ANSafe: Education Center dengan filter kategori penuh.
-- RBAC granular + audit log lengkap.
-- Notifikasi/reminder (mis. checklist belum lengkap, handover belum dikunci).
+- Angsmart: Master Diagnosa Keperawatan & Rencana Keperawatan.
+- ANSafe: Education Center penuh dengan filter video.
+- Notifikasi terintegrasi (misal: pengingat otomatis ke perawat jika pasien belum membaca guide Pre-OP).
 
 ### Fase 3 — Integrasi Lanjutan
-- Integrasi SIMRS/BPJS.
-- Aplikasi mobile native.
-- Analitik lanjutan (tren risiko jatuh, waktu tunggu OP, dsb).
+- Integrasi SIMRS / BPJS / RME.
+- Aplikasi mobile native untuk pasien dan perawat.
 
 ---
 
@@ -348,20 +328,20 @@ Dashboard ANSafe
 
 | Istilah | Penjelasan |
 |---|---|
-| **Pre-OP** | Fase sebelum tindakan operasi (persiapan) |
-| **Post-OP** | Fase setelah tindakan operasi (pemulihan) |
-| **MFS (Morse Fall Scale)** | Instrumen standar untuk menilai risiko jatuh pasien |
-| **Handover** | Proses serah terima informasi pasien antar shift perawat |
-| **Foreign Key (FK)** | Relasi basis data yang menghubungkan record antar tabel |
-| **RBAC** | Role-Based Access Control, pengaturan hak akses berdasarkan peran pengguna |
+| **Pre-OP Guide** | Panduan persiapan sebelum tindakan operasi khusus untuk pasien |
+| **Post-OP Guide** | Panduan perawatan dan pemulihan pasca operasi khusus untuk pasien |
+| **Verifikasi Pre-OP/Post-OP** | Form verifikasi medis yang diisi oleh perawat untuk memastikan keselamatan bedah |
+| **Monitoring Akun Pasien** | Fitur perawat untuk memantau status keterbacaan panduan oleh pasien |
+| **MFS (Morse Fall Scale)** | Skala penilaian standar risiko jatuh pasien |
+| **Handover** | Serah terima tugas dan kondisi pasien antar shift perawat |
 
 ---
 
 ## 17. Lampiran
 
-- Lampiran A: Referensi tangkapan layar (snapshot) aplikasi existing dari folder *PK Kesehatan* (Surgicon, Angsmart, ANSafe) — untuk dijadikan acuan wireframe/UI.
-- Lampiran B: Rencana pengembangan lanjutan — Desain ERD detail, Wireframe/High-Fidelity UI, penetapan RBAC final.
+- Lampiran A: Referensi desain antarmuka Surgicon, Angsmart, dan ANSafe.
+- Lampiran B: Draft materi edukasi Pre-OP dan Post-OP Guide untuk Pasien.
 
 ---
 
-*Dokumen ini merupakan hasil konsolidasi dan penyempurnaan dari diskusi PRD sebelumnya, dengan penambahan bab Persona, RBAC, Skema Data, Kebutuhan Non-Fungsional, KPI, Risiko, dan Roadmap agar lebih komprehensif dan siap dipakai sebagai acuan pengembangan.*
+*Dokumen PRD ini telah disesuaikan secara menyeluruh dengan struktur 2 aktor pengguna pada Surgicon.*
