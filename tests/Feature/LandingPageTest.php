@@ -20,7 +20,7 @@ class LandingPageTest extends TestCase
         $response->assertSee('Satu Ekosistem Medis', false);
 
         // Three Main Apps and Factual Descriptions
-        $response->assertSee('Surgicon');
+        $response->assertSee('Surgicare');
         $response->assertSee('Pencatatan alur operasi bedah');
         $response->assertSee('Angsmart');
         $response->assertSee('Dokumentasi asuhan keperawatan');

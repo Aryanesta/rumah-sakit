@@ -2,8 +2,31 @@
 
 namespace App\Support;
 
+use App\Enums\UserRole;
+use App\Models\User;
+
 final class ApplicationLauncher
 {
+    /**
+     * @return list<array{key: string, label: string, route: string, icon: string, variant: 'primary'|'surface'|'muted'}>
+     */
+    public static function applicationsForUser(?User $user): array
+    {
+        if ($user !== null && $user->role instanceof UserRole && $user->role === UserRole::Patient) {
+            return [
+                [
+                    'key' => 'siap-operasi',
+                    'label' => 'SIAP OPERASI',
+                    'route' => 'apps.surgicare.siap-operasi.index',
+                    'icon' => 'surgicare',
+                    'variant' => 'primary',
+                ],
+            ];
+        }
+
+        return self::applications();
+    }
+
     /**
      * Registered hospital applications shown on the post-login launcher.
      *
@@ -13,10 +36,10 @@ final class ApplicationLauncher
     {
         return [
             [
-                'key' => 'surgicon',
-                'label' => 'Surgicon',
-                'route' => 'apps.surgicon.index',
-                'icon' => 'surgicon',
+                'key' => 'surgicare',
+                'label' => 'Surgicare',
+                'route' => 'apps.surgicare.index',
+                'icon' => 'surgicare',
                 'variant' => 'primary',
             ],
             [

@@ -139,11 +139,11 @@
                 <!-- 3-Column Responsive Module Cards Grid (Based on Reference) -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto w-full">
                     
-                    <!-- Card 1: Surgicon -->
+                    <!-- Card 1: Surgicare -->
                     <a href="{{ route('login') }}" class="group relative block h-88 sm:h-96 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300">
                         <div
                             class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                            style="background-image: url('{{ asset('images/landing/surgicon.jpg') }}');"
+                            style="background-image: url('{{ asset('images/landing/surgicare.jpg') }}');"
                             role="presentation"
                         ></div>
                         <div class="absolute inset-0 bg-slate-950/55 group-hover:bg-slate-950/45 transition-colors duration-300" aria-hidden="true"></div>
@@ -157,7 +157,7 @@
 
                         <!-- Unhovered Bottom Bar: Title & Accent Line (Hidden when hovered) -->
                         <div class="absolute inset-x-0 bottom-0 z-10 p-6 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent transition-opacity duration-300 group-hover:opacity-0 pointer-events-none">
-                            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">Surgicon</h3>
+                            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">Surgicare</h3>
                             <div class="mt-3 h-1.5 w-full bg-emerald-500 rounded-full"></div>
                         </div>
 
@@ -167,7 +167,7 @@
                             style="clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 100%);"
                         >
                             <div>
-                                <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">Surgicon</h3>
+                                <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">Surgicare</h3>
                                 <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed font-normal">
                                     Pencatatan alur operasi bedah, verifikasi checklist keselamatan Pre-OP dan Post-OP, serta pemantauan kesiapan kamar operasi.
                                 </p>
@@ -277,7 +277,7 @@
             <!-- Footer Links Row -->
             <div class="flex flex-wrap items-center justify-between gap-6 pb-12 border-b border-slate-800 text-xs sm:text-sm font-semibold text-slate-400">
                 <div class="flex items-center gap-6">
-                    <a href="#tiga-pilar" class="hover:text-white transition-colors">Surgicon</a>
+                    <a href="#tiga-pilar" class="hover:text-white transition-colors">Surgicare</a>
                     <a href="#tiga-pilar" class="hover:text-white transition-colors">Angsmart</a>
                     <a href="#tiga-pilar" class="hover:text-white transition-colors">ANSafe</a>
                 </div>

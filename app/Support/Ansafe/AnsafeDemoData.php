@@ -3,6 +3,7 @@
 namespace App\Support\Ansafe;
 
 use App\Enums\Ansafe\FallRiskCategory;
+use App\Support\Hospital\SharedPatientCatalog;
 
 final class AnsafeDemoData
 {
@@ -17,6 +18,75 @@ final class AnsafeDemoData
             'sedang' => 8,
             'tinggi' => 6,
             'education_pending' => 4,
+        ];
+    }
+
+    /**
+     * @return array<string, array{risk: FallRiskCategory, last_assessment_at: string, mfs_selections: array<string, string>}>
+     */
+    private static function ansafeExtensions(): array
+    {
+        return [
+            'budi-santoso' => [
+                'risk' => FallRiskCategory::Tinggi,
+                'last_assessment_at' => '23 Sep 2024 08:15',
+                'mfs_selections' => [
+                    'history_of_falling' => 'yes',
+                    'secondary_diagnosis' => 'no',
+                    'ambulatory_aid' => 'furniture',
+                    'iv_therapy' => 'no',
+                    'gait' => 'normal',
+                    'mental_status' => 'oriented',
+                ],
+            ],
+            'siti-rahayu' => [
+                'risk' => FallRiskCategory::Sedang,
+                'last_assessment_at' => '22 Sep 2024 14:30',
+                'mfs_selections' => [
+                    'history_of_falling' => 'no',
+                    'secondary_diagnosis' => 'yes',
+                    'ambulatory_aid' => 'crutch',
+                    'iv_therapy' => 'yes',
+                    'gait' => 'weak',
+                    'mental_status' => 'oriented',
+                ],
+            ],
+            'made-wijaya' => [
+                'risk' => FallRiskCategory::Rendah,
+                'last_assessment_at' => '23 Sep 2024 07:00',
+                'mfs_selections' => [
+                    'history_of_falling' => 'no',
+                    'secondary_diagnosis' => 'no',
+                    'ambulatory_aid' => 'none',
+                    'iv_therapy' => 'no',
+                    'gait' => 'normal',
+                    'mental_status' => 'oriented',
+                ],
+            ],
+            'dewi-kartika' => [
+                'risk' => FallRiskCategory::Tinggi,
+                'last_assessment_at' => '21 Sep 2024 16:45',
+                'mfs_selections' => [
+                    'history_of_falling' => 'yes',
+                    'secondary_diagnosis' => 'yes',
+                    'ambulatory_aid' => 'furniture',
+                    'iv_therapy' => 'no',
+                    'gait' => 'impaired',
+                    'mental_status' => 'forgets',
+                ],
+            ],
+            'agus-pratama' => [
+                'risk' => FallRiskCategory::Sedang,
+                'last_assessment_at' => '23 Sep 2024 09:20',
+                'mfs_selections' => [
+                    'history_of_falling' => 'no',
+                    'secondary_diagnosis' => 'yes',
+                    'ambulatory_aid' => 'none',
+                    'iv_therapy' => 'yes',
+                    'gait' => 'weak',
+                    'mental_status' => 'oriented',
+                ],
+            ],
         ];
     }
 
@@ -36,103 +106,20 @@ final class AnsafeDemoData
      */
     public static function patients(): array
     {
-        return [
-            [
-                'slug' => 'budi-santoso',
-                'name' => 'Tn. Budi Santoso',
-                'medical_record' => '123456',
-                'age' => 67,
-                'room' => 'Angsoka 1',
-                'bed' => '102',
-                'diagnosis' => 'Fraktur Femur',
-                'risk' => FallRiskCategory::Tinggi,
-                'last_assessment_at' => '23 Sep 2024 08:15',
-                'mfs_selections' => [
-                    'history_of_falling' => 'yes',
-                    'secondary_diagnosis' => 'no',
-                    'ambulatory_aid' => 'furniture',
-                    'iv_therapy' => 'no',
-                    'gait' => 'normal',
-                    'mental_status' => 'oriented',
-                ],
-            ],
-            [
-                'slug' => 'siti-rahayu',
-                'name' => 'Ny. Siti Rahayu',
-                'medical_record' => '123457',
-                'age' => 54,
-                'room' => 'Angsoka 1',
-                'bed' => '105',
-                'diagnosis' => 'Stroke',
-                'risk' => FallRiskCategory::Sedang,
-                'last_assessment_at' => '22 Sep 2024 14:30',
-                'mfs_selections' => [
-                    'history_of_falling' => 'no',
-                    'secondary_diagnosis' => 'yes',
-                    'ambulatory_aid' => 'crutch',
-                    'iv_therapy' => 'yes',
-                    'gait' => 'weak',
-                    'mental_status' => 'oriented',
-                ],
-            ],
-            [
-                'slug' => 'made-wijaya',
-                'name' => 'Tn. Made Wijaya',
-                'medical_record' => '123458',
-                'age' => 42,
-                'room' => 'Angsoka 2',
-                'bed' => '201',
-                'diagnosis' => 'Appendektomi',
-                'risk' => FallRiskCategory::Rendah,
-                'last_assessment_at' => '23 Sep 2024 07:00',
-                'mfs_selections' => [
-                    'history_of_falling' => 'no',
-                    'secondary_diagnosis' => 'no',
-                    'ambulatory_aid' => 'none',
-                    'iv_therapy' => 'no',
-                    'gait' => 'normal',
-                    'mental_status' => 'oriented',
-                ],
-            ],
-            [
-                'slug' => 'dewi-kartika',
-                'name' => 'Ny. Dewi Kartika',
-                'medical_record' => '123459',
-                'age' => 71,
-                'room' => 'Angsoka 1',
-                'bed' => '108',
-                'diagnosis' => 'Hipertensi',
-                'risk' => FallRiskCategory::Tinggi,
-                'last_assessment_at' => '21 Sep 2024 16:45',
-                'mfs_selections' => [
-                    'history_of_falling' => 'yes',
-                    'secondary_diagnosis' => 'yes',
-                    'ambulatory_aid' => 'furniture',
-                    'iv_therapy' => 'no',
-                    'gait' => 'impaired',
-                    'mental_status' => 'forgets',
-                ],
-            ],
-            [
-                'slug' => 'agus-pratama',
-                'name' => 'Tn. Agus Pratama',
-                'medical_record' => '123460',
-                'age' => 58,
-                'room' => 'Angsoka 2',
-                'bed' => '203',
-                'diagnosis' => 'Diabetes Melitus',
-                'risk' => FallRiskCategory::Sedang,
-                'last_assessment_at' => '23 Sep 2024 09:20',
-                'mfs_selections' => [
-                    'history_of_falling' => 'no',
-                    'secondary_diagnosis' => 'yes',
-                    'ambulatory_aid' => 'none',
-                    'iv_therapy' => 'yes',
-                    'gait' => 'weak',
-                    'mental_status' => 'oriented',
-                ],
-            ],
-        ];
+        $extensions = self::ansafeExtensions();
+        $patients = [];
+
+        foreach (SharedPatientCatalog::corePatients() as $core) {
+            $extra = $extensions[$core['slug']] ?? null;
+
+            if ($extra === null) {
+                continue;
+            }
+
+            $patients[] = array_merge($core, $extra);
+        }
+
+        return $patients;
     }
 
     /**

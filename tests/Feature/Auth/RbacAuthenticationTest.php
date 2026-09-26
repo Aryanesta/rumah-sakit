@@ -134,7 +134,7 @@ class RbacAuthenticationTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Ns. Siti Rahma');
-        $response->assertSee('Surgicon');
+        $response->assertSee('Surgicare');
         $response->assertSee('Angsmart');
         $response->assertSee('ANSafe');
     }
@@ -149,9 +149,9 @@ class RbacAuthenticationTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Budi Santoso');
-        $response->assertSee('Surgicon');
-        $response->assertSee('Angsmart');
-        $response->assertSee('ANSafe');
+        $response->assertSee('SIAP OPERASI');
+        $response->assertDontSee('Angsmart');
+        $response->assertDontSee('ANSafe');
     }
 
     public function test_seeded_nurse_and_patient_accounts_can_login_directly(): void

@@ -1,10 +1,10 @@
 # Product Requirement Document (PRD)
-## Sistem Informasi Pelayanan Kesehatan Terpadu: Surgicon, Angsmart, ANSafe & Landing Page
+## Sistem Informasi Pelayanan Kesehatan Terpadu: Surgicare, Angsmart, ANSafe & Landing Page
 
 | | |
 |---|---|
-| **Proyek** | Ekosistem Digital Pelayanan Bedah & Keperawatan (Surgicon, Angsmart, ANSafe) |
-| **Status Dokumen** | Draft v4 — Terintegrasi Fitur Pasien & Monitoring Surgicon |
+| **Proyek** | Ekosistem Digital Pelayanan Bedah & Keperawatan (Surgicare, Angsmart, ANSafe) |
+| **Status Dokumen** | Draft v4 — Terintegrasi Fitur Pasien & Monitoring Surgicare |
 | **Tanggal** | 25 September 2026 |
 | **Disusun untuk** | Tim Produk & Pengembang PK Kesehatan |
 
@@ -17,7 +17,7 @@
 4. Target Pengguna & Persona
 5. Landing Page (Informasi Publik)
 6. Spesifikasi Fitur Utama
-   - 6.1 Surgicon (Perawat & Pasien)
+   - 6.1 Surgicare (Perawat & Pasien)
    - 6.2 Angsmart
    - 6.3 ANSafe
 7. Hak Akses Pengguna (RBAC)
@@ -38,7 +38,7 @@
 
 Dokumen ini menjabarkan kebutuhan produk untuk tiga aplikasi yang saling terintegrasi di lingkungan pelayanan kesehatan:
 
-- **Surgicon** — manajemen alur bedah (Pre-OP, Intra-OP, Post-OP) yang mendukung 2 aktor utama: **Perawat** (Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien) dan **Pasien** (Persiapan Sebelum Operasi & Persiapan Pasca Operasi berbasis Guide dan Checklist Membaca).
+- **Surgicare** — manajemen alur bedah (Pre-OP, Intra-OP, Post-OP) yang mendukung 2 aktor utama: **Perawat** (Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien) dan **Pasien** (Persiapan Sebelum Operasi & Persiapan Pasca Operasi berbasis Guide dan Checklist Membaca).
 - **Angsmart** — asuhan keperawatan, diagnosa keperawatan, rencana keperawatan, dan handover antar shift.
 - **ANSafe** — asesmen risiko jatuh pasien (Morse Fall Scale) dan pusat edukasi keselamatan pasien.
 
@@ -77,7 +77,7 @@ Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-op
 
 ### 3.1 Dalam Lingkup (In-Scope)
 - Landing page publik + katalog video edukasi.
-- **Modul Surgicon (2 Aktor)**:
+- **Modul Surgicare (2 Aktor)**:
   - *Aktor Pasien*: Portal akses panduan & checklist persiapan sebelum operasi (Pre-OP) dan pasca operasi (Post-OP).
   - *Aktor Perawat*: Beranda (Dashboard), List Pasien, Verifikasi Sebelum Operasi (Pre-OP Checklist), Verifikasi Pasca Bedah (Post-OP Checklist), dan Monitoring Akun Pasien.
 - **Modul Angsmart**: dashboard, list pasien, asuhan keperawatan, handover, diagnosa keperawatan, rencana keperawatan.
@@ -96,8 +96,8 @@ Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-op
 
 | Persona | Peran | Kebutuhan Utama |
 |---|---|---|
-| **Perawat Ruang OK (Surgicon Nurse)** | Mengelola verifikasi bedah & memantau akun pasien | Verifikasi cepat Pre-OP/Post-OP, memantau status checklist guide pasien secara real-time |
-| **Pasien Bedah (Surgicon Patient)** | Mengakses edukasi pra & pasca operasi mandiri | Antarmuka intuitif untuk membaca panduan operasi dan men-checklist konfirmasi membaca |
+| **Perawat Ruang OK (Surgicare Nurse)** | Mengelola verifikasi bedah & memantau akun pasien | Verifikasi cepat Pre-OP/Post-OP, memantau status checklist guide pasien secara real-time |
+| **Pasien Bedah (Surgicare Patient)** | Mengakses edukasi pra & pasca operasi mandiri | Antarmuka intuitif untuk membaca panduan operasi dan men-checklist konfirmasi membaca |
 | **Perawat Ruangan (Rawat Inap)** | Mengelola asuhan & handover di Angsmart | Ringkasan pasien cepat, form asuhan mudah diisi tiap shift |
 | **Perawat Penilai Risiko (ANSafe)** | Melakukan asesmen MFS berkala | Form skor otomatis, riwayat asesmen mudah dilihat |
 | **Kepala Ruangan / Supervisor** | Memantau seluruh unit | Dashboard ringkas, indikator risiko & status real-time |
@@ -113,11 +113,11 @@ Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyed
 ### 5.2 Struktur & Komponen
 1. **Hero Section**
    - Headline: "Presisi, Keselamatan, dan Intelijen dalam Satu Ekosistem Medis."
-   - Sub-headline: penjelasan singkat integrasi Surgicon, Angsmart, ANSafe.
+   - Sub-headline: penjelasan singkat integrasi Surgicare, Angsmart, ANSafe.
    - CTA: "Masuk Staf Medis" / "Portal Pasien" / "Lihat Edukasi Keselamatan".
 2. **Profil Pusat Kesehatan** — visi, misi, sejarah singkat, fasilitas penunjang.
 3. **Tiga Pilar Utama (Card Fitur)**
-   - Card Surgicon — ringkasan fungsi manajemen bedah & edukasi pasien.
+   - Card Surgicare — ringkasan fungsi manajemen bedah & edukasi pasien.
    - Card Angsmart — ringkasan fungsi asuhan keperawatan & handover.
    - Card ANSafe — ringkasan fungsi asesmen risiko jatuh.
 4. **Dokter & Tenaga Medis** — daftar dokter spesialis, jadwal praktik.
@@ -129,9 +129,9 @@ Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyed
 
 ## 6. Spesifikasi Fitur Utama
 
-### 6.1 Modul Surgicon (Manajemen Pelayanan Bedah & Edukasi Pasien)
+### 6.1 Modul Surgicare (Manajemen Pelayanan Bedah & Edukasi Pasien)
 
-Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
+Modul Surgicare dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
 
 #### A. Aktor Perawat
 | ID | Fitur | Elemen UI | Deskripsi & Logika Bisnis | Acceptance Criteria |
@@ -175,9 +175,9 @@ Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
 
 ## 7. Hak Akses Pengguna (RBAC)
 
-| Peran | Surgicon | Angsmart | ANSafe | Landing Page (Admin) |
+| Peran | Surgicare | Angsmart | ANSafe | Landing Page (Admin) |
 |---|---|---|---|---|
-| **Perawat Surgicon** | Full Akses (Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien) | Lihat saja | Lihat saja | — |
+| **Perawat Surgicare** | Full Akses (Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien) | Lihat saja | Lihat saja | — |
 | **Pasien** | Akses Portal Pasien (Persiapan Pre-OP Guide & Checklist, Persiapan Post-OP Guide & Checklist) | — | — | Lihat konten publik |
 | **Perawat Ruangan** | Lihat saja | Full akses (asuhan, handover, rencana) | Lihat & isi asesmen | — |
 | **Kepala Ruangan** | Lihat semua dashboard | Lihat semua dashboard | Lihat semua dashboard | Lihat laporan |
@@ -187,9 +187,9 @@ Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
 
 ## 8. Alur Pengguna (User Flow)
 
-### 8.1 Flow Surgicon - Perawat
+### 8.1 Flow Surgicare - Perawat
 ```
-[ Login Perawat ] → [ Beranda Surgicon ]
+[ Login Perawat ] → [ Beranda Surgicare ]
                          │
         ┌────────────────┼────────────────┬────────────────┐
         ▼                ▼                ▼                ▼
@@ -197,7 +197,7 @@ Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
   (Tambah Pasien)    (Pre-OP)         (Post-OP)     (Akun Pasien)
 ```
 
-### 8.2 Flow Surgicon - Pasien
+### 8.2 Flow Surgicare - Pasien
 ```
 [ Akses Portal Pasien ] (Login No. RM / Token)
          │
@@ -264,7 +264,7 @@ Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
    - Verifikasi Perawat (Pre-OP & Post-OP) berfokus pada persetujuan medis, pemeriksaan fisik, kesiapan alat, dan keselamatan klinis.
 
 4. **Integrasi Master Data**:
-   Penambahan pasien baru oleh perawat di Surgicon secara otomatis meregistrasikan ID pasien ke Master Data dan menyiapkan slot record di modul Angsmart dan ANSafe.
+   Penambahan pasien baru oleh perawat di Surgicare secara otomatis meregistrasikan ID pasien ke Master Data dan menyiapkan slot record di modul Angsmart dan ANSafe.
 
 ---
 
@@ -306,7 +306,7 @@ Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
 
 ### Fase 1 — MVP (Prioritas Tinggi)
 - Landing page + Login terpisah (Perawat/Staf & Akses Pasien).
-- Surgicon:
+- Surgicare:
   - Portal Perawat: Beranda, List Pasien, Verifikasi Pre-OP, Verifikasi Post-OP, Monitoring Akun Pasien.
   - Portal Pasien: Persiapan Pre-OP Guide & Checklist, Persiapan Post-OP Guide & Checklist.
 - Angsmart: Dashboard, List Pasien, Asuhan Keperawatan, Handover.
@@ -339,9 +339,9 @@ Modul Surgicon dirancang untuk 2 aktor utama, yaitu **Perawat** dan **Pasien**.
 
 ## 17. Lampiran
 
-- Lampiran A: Referensi desain antarmuka Surgicon, Angsmart, dan ANSafe.
+- Lampiran A: Referensi desain antarmuka Surgicare, Angsmart, dan ANSafe.
 - Lampiran B: Draft materi edukasi Pre-OP dan Post-OP Guide untuk Pasien.
 
 ---
 
-*Dokumen PRD ini telah disesuaikan secara menyeluruh dengan struktur 2 aktor pengguna pada Surgicon.*
+*Dokumen PRD ini telah disesuaikan secara menyeluruh dengan struktur 2 aktor pengguna pada Surgicare.*

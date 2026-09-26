@@ -73,10 +73,10 @@ class SuperadminLoginTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Super Administrator');
-        $response->assertSee('Surgicon');
+        $response->assertSee('Surgicare');
         $response->assertSee('Angsmart');
         $response->assertSee('ANSafe');
-        $response->assertSee(route('apps.surgicon.index'), false);
+        $response->assertSee(route('apps.surgicare.index'), false);
     }
 
     public function test_seeded_superadmin_can_login_directly(): void
