@@ -8,17 +8,17 @@
             type="search"
             x-model="search"
             placeholder="Cari nama pasien / No. RM / Bed / Diagnosis..."
-            class="w-full rounded-xl border-rs-border bg-rs-surface pl-10 pr-4 py-2.5 text-sm focus:border-rs-primary focus:ring-rs-primary"
+            class="w-full rounded-xl border-rs-border bg-rs-surface pl-10 pr-4 py-2.5 text-sm focus:border-amber-500 focus:ring-amber-500"
         />
     </label>
 
-    <select x-model="room" class="rounded-xl border-rs-border bg-rs-surface text-sm focus:border-rs-primary focus:ring-rs-primary">
+    <select x-model="room" class="rounded-xl border-rs-border bg-rs-surface text-sm focus:border-amber-500 focus:ring-amber-500">
         @foreach ($roomOptions as $option)
             <option value="{{ $option }}">{{ $option }}</option>
         @endforeach
     </select>
 
-    <select x-model="risk" class="rounded-xl border-rs-border bg-rs-surface text-sm focus:border-rs-primary focus:ring-rs-primary">
+    <select x-model="risk" class="rounded-xl border-rs-border bg-rs-surface text-sm focus:border-amber-500 focus:ring-amber-500">
         <option value="semua">Semua Risiko</option>
         <option value="rendah">Rendah</option>
         <option value="sedang">Sedang</option>
@@ -28,7 +28,7 @@
     <button
         type="button"
         @click="resetFilters()"
-        class="rounded-xl bg-rs-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-rs-primary-dark transition-colors"
+        class="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
     >
         Reset
     </button>

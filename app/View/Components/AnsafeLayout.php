@@ -8,7 +8,7 @@ use Illuminate\View\View;
 class AnsafeLayout extends Component
 {
     public function __construct(
-        public ?string $breadcrumb = null,
+        public ?string $pageTitle = null,
     ) {}
 
     public function render(): View

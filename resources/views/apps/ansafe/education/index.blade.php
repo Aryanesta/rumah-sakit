@@ -1,11 +1,4 @@
-<x-ansafe-layout breadcrumb="Beranda › Education Center">
-    <div class="mb-6 rounded-2xl border border-rs-border bg-rs-surface p-6 sm:p-8">
-        <h1 class="text-2xl font-bold text-rs-primary-dark">Edukasi Mencegah Jatuh untuk Pasien dan Keluarga</h1>
-        <p class="mt-2 text-sm text-rs-text-secondary max-w-3xl">
-            Video dan materi edukasi untuk meningkatkan kesadaran pencegahan risiko jatuh di rumah sakit dan di rumah.
-        </p>
-    </div>
-
+<x-ansafe-layout pageTitle="Education Center">
     <div
         x-data="ansafeEducationFilter(@js($videos))"
         class="grid grid-cols-1 xl:grid-cols-4 gap-6"

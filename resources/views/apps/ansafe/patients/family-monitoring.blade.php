@@ -1,4 +1,4 @@
-<x-ansafe-layout breadcrumb="Beranda › Monitoring Edukasi Keluarga">
+<x-ansafe-layout pageTitle="Monitoring Edukasi Keluarga">
     <x-ansafe.patient-header-card :patient="$patient" class="mb-6" />
 
     <div x-data="{ tab: 'riwayat' }" class="space-y-6">
@@ -6,7 +6,7 @@
             <button
                 type="button"
                 @click="tab = 'riwayat'"
-                :class="tab === 'riwayat' ? 'border-rs-primary text-rs-primary font-semibold' : 'border-transparent text-rs-text-secondary'"
+                :class="tab === 'riwayat' ? 'border-amber-600 text-amber-600 font-semibold' : 'border-transparent text-rs-text-secondary'"
                 class="pb-3 text-sm border-b-2 transition-colors"
             >
                 Riwayat Edukasi
@@ -14,7 +14,7 @@
             <button
                 type="button"
                 @click="tab = 'rekap'"
-                :class="tab === 'rekap' ? 'border-rs-primary text-rs-primary font-semibold' : 'border-transparent text-rs-text-secondary'"
+                :class="tab === 'rekap' ? 'border-amber-600 text-amber-600 font-semibold' : 'border-transparent text-rs-text-secondary'"
                 class="pb-3 text-sm border-b-2 transition-colors"
             >
                 Rekap Monitoring
@@ -43,7 +43,7 @@
                                 <td class="px-4 py-3">
                                     <span @class([
                                         'inline-flex items-center gap-1.5 text-xs font-semibold',
-                                        'text-rs-primary' => $row['media'] === 'video',
+                                        'text-amber-600' => $row['media'] === 'video',
                                         'text-rs-emergency' => $row['media'] === 'pdf',
                                     ])>
                                         {{ $row['media_label'] }}
@@ -51,7 +51,7 @@
                                 </td>
                                 <td class="px-4 py-3">{{ $row['accessed_by'] }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="inline-flex items-center gap-1 text-rs-accent-dark font-medium">
+                                    <span class="inline-flex items-center gap-1 text-emerald-700 font-medium">
                                         <svg class="h-4 w-4 text-rs-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         {{ $row['status'] }}
                                     </span>
@@ -88,14 +88,14 @@
                                     <td class="px-4 py-3">
                                         <span @class([
                                             'font-medium',
-                                            'text-rs-accent-dark' => $row['response_tone'] === 'success',
+                                            'text-emerald-700' => $row['response_tone'] === 'success',
                                             'text-rs-emergency' => $row['response_tone'] === 'emergency',
                                         ])>{{ $row['family_response'] }}</span>
                                     </td>
                                     <td class="px-4 py-3">{{ $row['nurse'] }}</td>
                                     <td class="px-4 py-3">
                                         @if ($row['status_tone'] === 'success')
-                                            <span class="inline-flex items-center gap-1 text-rs-accent-dark font-medium">
+                                            <span class="inline-flex items-center gap-1 text-emerald-700 font-medium">
                                                 <svg class="h-4 w-4 text-rs-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                                 {{ $row['status'] }}
                                             </span>
