@@ -1,9 +1,9 @@
 # Product Requirement Document (PRD)
-## Sistem Informasi Pelayanan Kesehatan Terpadu: Surgicon, Angsmart, ANSafe & Landing Page
+## Sistem Informasi Pelayanan Kesehatan Terpadu: Surgicare, Angsmart, ANSafe & Landing Page
 
 | | |
 |---|---|
-| **Proyek** | Ekosistem Digital Pelayanan Bedah & Keperawatan (Surgicon, Angsmart, ANSafe) |
+| **Proyek** | Ekosistem Digital Pelayanan Bedah & Keperawatan (Surgicare, Angsmart, ANSafe) |
 | **Status Dokumen** | Draft v3 — Komprehensif |
 | **Tanggal** | 24 September 2026 |
 | **Disusun untuk** | Tim Produk & Pengembang PK Kesehatan |
@@ -17,7 +17,7 @@
 4. Target Pengguna & Persona
 5. Landing Page (Informasi Publik)
 6. Spesifikasi Fitur Utama
-   - 6.1 Surgicon
+   - 6.1 Surgicare
    - 6.2 Angsmart
    - 6.3 ANSafe
 7. Hak Akses Pengguna (RBAC)
@@ -38,7 +38,7 @@
 
 Dokumen ini menjabarkan kebutuhan produk untuk tiga aplikasi yang saling terintegrasi di lingkungan pelayanan kesehatan:
 
-- **Surgicon** — manajemen alur bedah (Pre-OP, Intra-OP, Post-OP) beserta checklist keselamatan.
+- **Surgicare** — manajemen alur bedah (Pre-OP, Intra-OP, Post-OP) beserta checklist keselamatan.
 - **Angsmart** — asuhan keperawatan, diagnosa keperawatan, rencana keperawatan, dan handover antar shift.
 - **ANSafe** — asesmen risiko jatuh pasien (Morse Fall Scale) dan pusat edukasi keselamatan pasien.
 
@@ -74,7 +74,7 @@ Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-op
 
 ### 3.1 Dalam Lingkup (In-Scope)
 - Landing page publik + katalog video edukasi.
-- Modul Surgicon: dashboard, list pasien, Pre-OP checklist, Post-OP checklist.
+- Modul Surgicare: dashboard, list pasien, Pre-OP checklist, Post-OP checklist.
 - Modul Angsmart: dashboard, list pasien, asuhan keperawatan, handover, diagnosa keperawatan, rencana keperawatan.
 - Modul ANSafe: dashboard, list pasien & asesmen MFS, education center.
 - Sinkronisasi data pasien lintas modul (Foreign Key / Master Data).
@@ -93,7 +93,7 @@ Layanan kesehatan modern memerlukan integrasi data yang erat antara tahap pra-op
 
 | Persona | Peran | Kebutuhan Utama |
 |---|---|---|
-| **Perawat Ruang OK (Bedah)** | Mengelola pasien di Surgicon | Input cepat, checklist jelas per fase, minim klik |
+| **Perawat Ruang OK (Bedah)** | Mengelola pasien di Surgicare | Input cepat, checklist jelas per fase, minim klik |
 | **Perawat Ruangan (Rawat Inap)** | Mengelola asuhan & handover di Angsmart | Ringkasan pasien cepat, form asuhan mudah diisi tiap shift |
 | **Perawat Penilai Risiko (ANSafe)** | Melakukan asesmen MFS berkala | Form skor otomatis, riwayat asesmen mudah dilihat |
 | **Kepala Ruangan / Supervisor** | Memantau seluruh unit | Dashboard ringkas, indikator risiko & status real-time |
@@ -110,11 +110,11 @@ Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyed
 ### 5.2 Struktur & Komponen
 1. **Hero Section**
    - Headline: "Presisi, Keselamatan, dan Intelijen dalam Satu Ekosistem Medis."
-   - Sub-headline: penjelasan singkat integrasi Surgicon, Angsmart, ANSafe.
+   - Sub-headline: penjelasan singkat integrasi Surgicare, Angsmart, ANSafe.
    - CTA: "Masuk ke Aplikasi" / "Lihat Edukasi Keselamatan".
 2. **Profil Pusat Kesehatan** — visi, misi, sejarah singkat, fasilitas penunjang.
 3. **Tiga Pilar Utama (Card Fitur)**
-   - Card Surgicon — ringkasan fungsi manajemen bedah.
+   - Card Surgicare — ringkasan fungsi manajemen bedah.
    - Card Angsmart — ringkasan fungsi asuhan keperawatan & handover.
    - Card ANSafe — ringkasan fungsi asesmen risiko jatuh.
 4. **Dokter & Tenaga Medis** — daftar dokter spesialis, jadwal praktik.
@@ -125,13 +125,13 @@ Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyed
 ### 5.3 Kebutuhan Fungsional Landing Page
 - Responsif (desktop, tablet, mobile).
 - Video edukasi dapat diputar langsung (embedded player) tanpa perlu login.
-- Tombol login terpisah untuk staf (mengarah ke portal Surgicon/Angsmart/ANSafe sesuai hak akses).
+- Tombol login terpisah untuk staf (mengarah ke portal Surgicare/Angsmart/ANSafe sesuai hak akses).
 
 ---
 
 ## 6. Spesifikasi Fitur Utama
 
-### 6.1 Modul Surgicon (Manajemen Pelayanan Bedah)
+### 6.1 Modul Surgicare (Manajemen Pelayanan Bedah)
 
 | ID | Fitur | Elemen UI | Deskripsi & Logika Bisnis | Acceptance Criteria |
 |---|---|---|---|---|
@@ -163,7 +163,7 @@ Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyed
 
 ## 7. Hak Akses Pengguna (RBAC)
 
-| Peran | Surgicon | Angsmart | ANSafe | Landing Page (Admin) |
+| Peran | Surgicare | Angsmart | ANSafe | Landing Page (Admin) |
 |---|---|---|---|---|
 | Perawat OK/Bedah | Full akses (CRUD pasien, checklist) | Lihat saja | Lihat saja | — |
 | Perawat Ruangan | Lihat saja | Full akses (asuhan, handover, rencana) | Lihat & isi asesmen | — |
@@ -183,12 +183,12 @@ Menjadi *hub* informasi publik yang memperkenalkan ekosistem aplikasi dan menyed
                                           │
         ┌─────────────────────────────────┼─────────────────────────────────┐
         ▼                                 ▼                                 ▼
-  [ SURGICON ]                     [ ANGSMART ]                       [ ANSAFE ]
+  [ SURGICARE ]                     [ ANGSMART ]                       [ ANSAFE ]
 ```
 
-### 8.2 Flow Surgicon
+### 8.2 Flow Surgicare
 ```
-Dashboard Surgicon
+Dashboard Surgicare
   └─ List Pasien
        └─ Tambah Pasien → (auto-create FK ke Asuhan Keperawatan)
   └─ Halaman Pre-OP Checklist (terpisah)
@@ -237,13 +237,13 @@ Dashboard ANSafe
 - **Video Edukasi** — id, judul, kategori, url/embed, durasi.
 
 ### 9.2 Relasi Kunci
-- `Pasien (1) — (N) Asuhan Keperawatan` (dibuat otomatis saat pasien ditambahkan di Surgicon).
+- `Pasien (1) — (N) Asuhan Keperawatan` (dibuat otomatis saat pasien ditambahkan di Surgicare).
 - `Pasien (1) — (N) Checklist Pre-OP/Post-OP`.
 - `Pasien (1) — (N) Asesmen MFS` (riwayat asesmen dari waktu ke waktu, bukan overwrite).
 - `Diagnosa Keperawatan (1) — (N) Rencana Keperawatan`.
 - `Pasien + Asuhan Keperawatan → Handover Log` (agregasi, bukan tabel FK langsung, tapi query gabungan saat handover dibuat).
 
-> Rekomendasi teknis: gunakan `pasien_id` sebagai kunci federasi tunggal di seluruh modul agar tidak terjadi data pasien ganda antar Surgicon/Angsmart/ANSafe.
+> Rekomendasi teknis: gunakan `pasien_id` sebagai kunci federasi tunggal di seluruh modul agar tidak terjadi data pasien ganda antar Surgicare/Angsmart/ANSafe.
 
 ---
 
@@ -267,10 +267,10 @@ Dashboard ANSafe
    Dipisah menjadi dua halaman agar validasi tahap operasi berjalan sekuensial dan mengurangi kebingungan petugas di lapangan. Status pasien tidak bisa "lompat fase" tanpa checklist fase sebelumnya lengkap.
 
 2. **Sinkronisasi Data Pasien Bedah & Keperawatan**
-   Saat pasien baru ditambahkan di Surgicon, sistem otomatis membuat record kosong di `asuhan_keperawatan` via `pasien_id` (Foreign Key), menjamin *continuity of care* tanpa input ulang identitas.
+   Saat pasien baru ditambahkan di Surgicare, sistem otomatis membuat record kosong di `asuhan_keperawatan` via `pasien_id` (Foreign Key), menjamin *continuity of care* tanpa input ulang identitas.
 
 3. **Sinkronisasi Skor MFS ke Modul Lain**
-   Skor & kategori risiko dari ANSafe sebaiknya tampil sebagai badge di list pasien Angsmart dan Surgicon, agar tim medis selalu waspada terhadap pasien berisiko tinggi meski sedang bekerja di modul lain.
+   Skor & kategori risiko dari ANSafe sebaiknya tampil sebagai badge di list pasien Angsmart dan Surgicare, agar tim medis selalu waspada terhadap pasien berisiko tinggi meski sedang bekerja di modul lain.
 
 4. **Mekanisme Kunci Handover**
    Setelah "Kunci/Finalisasi Handover" ditekan, data menjadi read-only dan tersimpan sebagai log riwayat beraudit — mencegah manipulasi laporan shift setelah serah terima selesai.
@@ -326,7 +326,7 @@ Dashboard ANSafe
 
 ### Fase 1 — MVP (Prioritas Tinggi)
 - Landing page dasar + Education Hub.
-- Surgicon: Dashboard, List Pasien, Pre-OP & Post-OP Checklist.
+- Surgicare: Dashboard, List Pasien, Pre-OP & Post-OP Checklist.
 - Angsmart: Dashboard, List Pasien, Asuhan Keperawatan, Handover.
 - ANSafe: Dashboard, List Pasien & Asesmen MFS.
 - Master Data Pasien terpusat + sinkronisasi Foreign Key.
@@ -359,7 +359,7 @@ Dashboard ANSafe
 
 ## 17. Lampiran
 
-- Lampiran A: Referensi tangkapan layar (snapshot) aplikasi existing dari folder *PK Kesehatan* (Surgicon, Angsmart, ANSafe) — untuk dijadikan acuan wireframe/UI.
+- Lampiran A: Referensi tangkapan layar (snapshot) aplikasi existing dari folder *PK Kesehatan* (Surgicare, Angsmart, ANSafe) — untuk dijadikan acuan wireframe/UI.
 - Lampiran B: Rencana pengembangan lanjutan — Desain ERD detail, Wireframe/High-Fidelity UI, penetapan RBAC final.
 
 ---

@@ -12,7 +12,7 @@ final class AppLauncherController extends Controller
     public function index(): View
     {
         return view('dashboard', [
-            'applications' => ApplicationLauncher::applications(),
+            'applications' => ApplicationLauncher::applicationsForUser(Auth::user()),
             'greeting' => TimeGreeting::forUser(Auth::user()),
         ]);
     }
