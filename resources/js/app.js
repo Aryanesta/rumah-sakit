@@ -2,6 +2,7 @@
 import Alpine from 'alpinejs';
 import { ansafeEducationFilter, ansafeMfsForm } from './ansafe/morse-fall-scale';
 import { ansafePatientTable } from './ansafe/patient-table';
+import { ansafeStatCount } from './ansafe/stat-count';
 import { angsmartHandover } from './angsmart/handover';
 import { angsmartNursingCareForm } from './angsmart/nursing-care';
 import { angsmartPatientTable } from './angsmart/patient-table';
@@ -19,6 +20,7 @@ Alpine.data('ansafeMfsForm', (dimensions, selections) =>
     ansafeMfsForm(dimensions, selections),
 );
 Alpine.data('ansafeEducationFilter', (videos) => ansafeEducationFilter(videos));
+Alpine.data('ansafeStatCount', (target) => ansafeStatCount(target));
 
 Alpine.data('angsmartPatientTable', (patients) => angsmartPatientTable(patients));
 Alpine.data('angsmartNursingCareForm', (actionTypes) => angsmartNursingCareForm(actionTypes));

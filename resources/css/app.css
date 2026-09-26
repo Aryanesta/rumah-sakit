@@ -87,13 +87,20 @@
   animation: shake 0.85s ease-in-out infinite;
 }
 
+.ansafe-surface {
+  @apply transition-[box-shadow,transform,border-color] duration-300 ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-page-enter,
   .animate-element,
   .animate-fade-slide,
-  .animate-testimonial {
+  .animate-testimonial,
+  .group:hover .group-hover\:animate-shake,
+  .animate-shake {
     animation: none;
     opacity: 1;
+    transform: none;
   }
 }
 
