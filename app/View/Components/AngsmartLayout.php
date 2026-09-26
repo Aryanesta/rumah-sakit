@@ -8,6 +8,7 @@ use Illuminate\View\View;
 class AngsmartLayout extends Component
 {
     public function __construct(
+        public ?string $pageTitle = null,
         public ?string $breadcrumb = null,
     ) {}
 

@@ -1,5 +1,5 @@
-<x-angsmart-layout breadcrumb="Beranda › Handover">
-    <x-angsmart.page-header title="Handover" />
+<x-angsmart-layout pageTitle="Handover">
+    <x-angsmart.page-header title="Handover antar shift" class="animate-element animate-delay-100" />
 
     @php
         $tabs = [

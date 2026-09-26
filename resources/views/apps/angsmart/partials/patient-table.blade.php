@@ -1,4 +1,4 @@
-<div class="bg-rs-surface border border-rs-border rounded-2xl shadow-sm overflow-hidden">
+<div class="bg-rs-surface border border-rs-border rounded-2xl shadow-sm overflow-hidden angsmart-surface">
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead class="bg-rs-background text-rs-text-secondary">
@@ -19,7 +19,12 @@
                 <template x-for="(patient, index) in paginatedPatients()" :key="patient.slug">
                     <tr class="hover:bg-rs-background/80">
                         <td class="px-4 py-3 text-rs-text-secondary" x-text="rowNumber(index)"></td>
-                        <td class="px-4 py-3 font-medium text-rs-text-primary" x-text="patient.name"></td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-rs-primary/10 text-rs-primary-dark text-xs font-bold" x-text="patient.name.charAt(0)"></span>
+                                <span class="font-medium text-rs-text-primary" x-text="patient.name"></span>
+                            </div>
+                        </td>
                         <td class="px-4 py-3" x-text="patient.medical_record"></td>
                         <td class="px-4 py-3" x-text="patient.bed"></td>
                         <td class="px-4 py-3" x-text="patient.age + ' th'"></td>

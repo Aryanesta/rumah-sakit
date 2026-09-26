@@ -91,6 +91,10 @@
   @apply transition-[box-shadow,transform,border-color] duration-300 ease-out;
 }
 
+.angsmart-surface {
+  @apply transition-[box-shadow,transform,border-color] duration-300 ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-page-enter,
   .animate-element,

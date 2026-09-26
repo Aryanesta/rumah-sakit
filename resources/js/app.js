@@ -22,6 +22,8 @@ Alpine.data('ansafeMfsForm', (dimensions, selections) =>
 Alpine.data('ansafeEducationFilter', (videos) => ansafeEducationFilter(videos));
 Alpine.data('ansafeStatCount', (target) => ansafeStatCount(target));
 
+Alpine.data('angsmartStatCount', (target) => ansafeStatCount(target));
+
 Alpine.data('angsmartPatientTable', (patients) => angsmartPatientTable(patients));
 Alpine.data('angsmartNursingCareForm', (actionTypes) => angsmartNursingCareForm(actionTypes));
 Alpine.data('angsmartHandover', (details, defaultSlug) => angsmartHandover(details, defaultSlug));

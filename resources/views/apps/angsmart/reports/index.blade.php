@@ -1,5 +1,5 @@
-<x-angsmart-layout breadcrumb="Beranda › Laporan &amp; Monitoring">
-    <x-angsmart.page-header title="Laporan &amp; Monitoring" />
+<x-angsmart-layout pageTitle="Laporan">
+    <x-angsmart.page-header title="Laporan &amp; Monitoring" class="animate-element animate-delay-100" />
 
     @php
         $tabs = [

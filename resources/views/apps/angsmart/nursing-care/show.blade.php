@@ -1,7 +1,7 @@
-<x-angsmart-layout breadcrumb="Beranda › Asuhan Keperawatan">
-    <x-angsmart.page-header title="Asuhan Keperawatan" />
-
-    <x-angsmart.patient-header-card :patient="$patient" class="mb-6" />
+<x-angsmart-layout pageTitle="Asuhan Keperawatan">
+    <div class="animate-element animate-delay-100">
+        <x-angsmart.patient-header-card :patient="$patient" class="mb-6" />
+    </div>
 
     @php
         $patientSlug = $patient['slug'];

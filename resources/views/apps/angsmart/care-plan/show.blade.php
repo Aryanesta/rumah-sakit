@@ -1,5 +1,5 @@
-<x-angsmart-layout breadcrumb="Beranda › Rencana Keperawatan">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+<x-angsmart-layout pageTitle="Rencana Keperawatan">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6 animate-element animate-delay-100">
         <div>
             <h1 class="text-2xl font-bold text-rs-primary-dark">Rencana Keperawatan</h1>
             <p class="mt-2 text-sm text-rs-text-secondary">
