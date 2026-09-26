@@ -56,4 +56,24 @@ class UserFactory extends Factory
             'role' => UserRole::Superadmin,
         ]);
     }
+
+    /**
+     * Indicate that the user is a nurse.
+     */
+    public function nurse(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => UserRole::Nurse,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a patient.
+     */
+    public function patient(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => UserRole::Patient,
+        ]);
+    }
 }

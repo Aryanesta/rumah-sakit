@@ -39,4 +39,31 @@ class User extends Authenticatable
     {
         return $this->role === UserRole::Superadmin;
     }
+
+    /**
+     * Check if user has nurse role.
+     */
+    public function isNurse(): bool
+    {
+        return $this->role === UserRole::Nurse;
+    }
+
+    /**
+     * Check if user has patient role.
+     */
+    public function isPatient(): bool
+    {
+        return $this->role === UserRole::Patient;
+    }
+
+    /**
+     * Check if user has a specific role.
+     */
+    public function hasRole(UserRole|string $role): bool
+    {
+        $roleValue = $role instanceof UserRole ? $role->value : $role;
+        $currentRoleValue = $this->role instanceof UserRole ? $this->role->value : $this->role;
+
+        return $currentRoleValue === $roleValue;
+    }
 }
