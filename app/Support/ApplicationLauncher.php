@@ -56,6 +56,13 @@ final class ApplicationLauncher
                 'icon' => 'ansafe',
                 'variant' => 'surface',
             ],
+            [
+                'key' => 'patient-management',
+                'label' => 'Manajemen Data Pasien',
+                'route' => 'integration.patients.index',
+                'icon' => 'patients',
+                'variant' => 'surface',
+            ],
         ];
     }
 }
