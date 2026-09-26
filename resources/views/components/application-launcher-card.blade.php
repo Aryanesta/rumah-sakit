@@ -10,6 +10,7 @@
         'surgicare' => 'bg-emerald-50 border-2 border-emerald-400 hover:border-emerald-500 hover:bg-emerald-100/60',
         'angsmart' => 'bg-blue-50 border-2 border-blue-400 hover:border-blue-500 hover:bg-blue-100/60',
         'ansafe' => 'bg-amber-50 border-2 border-amber-400 hover:border-amber-500 hover:bg-amber-100/60',
+        'patients' => 'bg-violet-50 border-2 border-violet-400 hover:border-violet-500 hover:bg-violet-100/60',
         default => 'bg-rs-background border-2 border-rs-border hover:border-rs-text-secondary',
     };
 
@@ -17,6 +18,7 @@
         'surgicare' => 'text-emerald-950',
         'angsmart' => 'text-blue-950',
         'ansafe' => 'text-amber-950',
+        'patients' => 'text-violet-950',
         default => 'text-rs-text-primary',
     };
 
@@ -24,6 +26,7 @@
         'surgicare' => 'text-emerald-800',
         'angsmart' => 'text-blue-800',
         'ansafe' => 'text-amber-800',
+        'patients' => 'text-violet-800',
         default => 'text-rs-primary-dark',
     };
 
@@ -31,6 +34,7 @@
         'surgicare' => 'text-emerald-600',
         'angsmart' => 'text-blue-600',
         'ansafe' => 'text-amber-600',
+        'patients' => 'text-violet-600',
         default => 'text-rs-text-secondary',
     };
 @endphp

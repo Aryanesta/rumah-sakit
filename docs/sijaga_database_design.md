@@ -149,37 +149,9 @@ erDiagram
 | date_of_birth | DATE | dipakai untuk umur & otentikasi pasien |
 | gender | ENUM('M','F') | |
 | room_bed | VARCHAR(20), NULLABLE | |
-| diagnosis | TEXT | |
-| procedure_type | VARCHAR(150) | |
 | phase_status | ENUM('PRE_OP','INTRA_OP','POST_OP','INPATIENT_CARE','DISCHARGED') | sumber kebenaran status card di Beranda Surgicare/Angsmart |
-| surgery_schedule | DATETIME, NULLABLE | dipakai logika alert "< 2 jam belum baca guide" |
-| patient_access_code | VARCHAR(20), UNIQUE | token akses portal pasien |
 | created_by | INT, FK → users.id | perawat yang mendaftarkan |
 | created_at, updated_at | TIMESTAMP | |
-
-**`patient_access_tokens`**
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| id | INT, PK | |
-| patient_id | INT, FK → patients.id | |
-| token | VARCHAR(64), UNIQUE | |
-| expired_at | TIMESTAMP | |
-| is_used | BOOLEAN | |
-| created_at | TIMESTAMP | |
-
-**`family_members`** *(tabel baru — akun keluarga pasien)*
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| id | INT, PK | |
-| patient_id | INT, FK → patients.id | |
-| name | VARCHAR(150) | |
-| relationship | VARCHAR(50) | mis. "Anak", "Suami/Istri", "Orang Tua" |
-| phone_number | VARCHAR(20), NULLABLE | |
-| family_access_code | VARCHAR(20), UNIQUE | kode akses portal keluarga (terpisah dari `patient_access_code`) |
-| registered_by | INT, FK → users.id | perawat yang mendaftarkan akun keluarga |
-| is_active | BOOLEAN, DEFAULT true | perawat bisa nonaktifkan akses jika perlu |
-| created_at | TIMESTAMP | |
-
 ---
 
 ### 3.2 Modul Surgicare

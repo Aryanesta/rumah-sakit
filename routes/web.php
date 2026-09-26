@@ -6,13 +6,13 @@ use App\Http\Controllers\Angsmart\HandoverController as AngsmartHandoverControll
 use App\Http\Controllers\Angsmart\NursingCareController as AngsmartNursingCareController;
 use App\Http\Controllers\Angsmart\PatientListController as AngsmartPatientListController;
 use App\Http\Controllers\Angsmart\ReportController as AngsmartReportController;
-use App\Http\Controllers\Angsmart\StorePatientController as AngsmartStorePatientController;
 use App\Http\Controllers\Ansafe\DashboardController as AnsafeDashboardController;
 use App\Http\Controllers\Ansafe\EducationController as AnsafeEducationController;
 use App\Http\Controllers\Ansafe\FamilyMonitoringController as AnsafeFamilyMonitoringController;
 use App\Http\Controllers\Ansafe\PatientAssessmentController as AnsafePatientAssessmentController;
 use App\Http\Controllers\Ansafe\PatientListController as AnsafePatientListController;
 use App\Http\Controllers\AppLauncherController;
+use App\Http\Controllers\Integration\PatientManagementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Surgicare\DashboardController as SurgicareDashboardController;
 use App\Http\Controllers\Surgicare\PatientAccountMonitoringController;
@@ -35,6 +35,10 @@ Route::get('/', function () {
 Route::get('/dashboard', [AppLauncherController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::middleware(['auth', 'verified', 'role:nurse,doctor,superadmin,admin'])
+    ->get('/integration/patients', PatientManagementController::class)
+    ->name('integration.patients.index');
 
 Route::get('/apps/surgicon/{any?}', function (?string $any = null) {
     $suffix = $any !== null && $any !== '' ? '/'.$any : '';
@@ -69,7 +73,6 @@ Route::middleware(['auth', 'verified'])->prefix('apps')->name('apps.')->group(fu
     Route::prefix('angsmart')->name('angsmart.')->group(function () {
         Route::get('/', AngsmartDashboardController::class)->name('index');
         Route::get('/patients', AngsmartPatientListController::class)->name('patients.index');
-        Route::post('/patients', AngsmartStorePatientController::class)->name('patients.store');
         Route::get('/patients/{patient}/nursing-care', AngsmartNursingCareController::class)
             ->where('patient', '[A-Za-z0-9-]+')
             ->name('patients.nursing-care');

@@ -1,0 +1,1637 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}</style><style>:root{color-scheme:light dark;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}}:root[data-theme="dark"]{color-scheme:dark;--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}:root[data-theme="light"]{color-scheme:light}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}}body{background:var(--md-bg);color:var(--md-text);max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:10px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif;overflow-wrap:break-word}body>:first-child{margin-top:0}h1,h2,h3,h4,h5,h6{margin:6px 0 0;line-height:1.25;font-weight:600;text-wrap:balance}h1{font-size:1.35em}h2{font-size:1.15em;color:var(--md-muted)}h3,h4,h5,h6{font-size:1em}p,ul,ol,blockquote,table,pre,hr{margin:0}strong{font-weight:600}a{color:var(--md-link);text-decoration:none}a:hover{text-decoration:underline}ul,ol{display:flex;flex-direction:column;gap:6px;padding-left:22px}ul{list-style:disc}ol{list-style:decimal}:is(li,td,th)>*+:is(p,ul,ol,blockquote){margin-top:6px}blockquote{display:flex;flex-direction:column;gap:10px;border-left:2px solid var(--md-rule);padding-left:10px;color:var(--md-muted)}:not(pre)>code{background:var(--md-fill);padding:1px 3px;border-radius:4px;font:.92em 'SF Mono',ui-monospace,Menlo,Consolas,monospace}a>code{background:none;color:inherit}pre{background:var(--md-fill);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12px/1.5 'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-block:4px}pre code{background:none;padding:0;font:inherit}table{width:100%;border-collapse:separate;border-spacing:2px;font:inherit}th,td{padding:6px 8px;border-radius:3px;text-align:left;vertical-align:top}th{background:var(--md-fill-strong);font-weight:600}td{background:var(--md-fill)}:is(th,td) :not(pre)>code{background:transparent}hr{border:0;border-top:1px solid var(--md-rule-strong);margin-block:10px}img{max-width:100%;height:auto;border-radius:4px}</style>
+</head><body>
+<h1>Rancangan Struktur Database</h1>
+<h2>Ekosistem Surgicon, Angsmart, ANSafe &amp; Landing Page</h2>
+<p><strong>Versi:</strong> 1.2 — Revisi: Guide Checklist (Surgicon) &amp; Shift Reports berantai (Angsmart)
+<strong>Prinsip desain:</strong> Master Data Pasien tunggal, normalisasi hingga 3NF pada entitas transaksional, audit trail penuh, JSON dipakai seminimal mungkin (hanya untuk snapshot, bukan sumber kebenaran utama).</p>
+<blockquote>
+<p><strong>Ringkasan perubahan dari v1.1:</strong></p>
+<ol>
+<li>Modul Surgicon — ditambahkan <code>guide_checklist_items</code> &amp; <code>patient_guide_checklist_answers</code>, serta kolom baru di <code>patient_guide_logs</code>, untuk mendukung alur: pasien baca guide → isi checklist pemahaman → status <code>COMPLETED</code> otomatis saat semua poin tercentang → hasil diteruskan ke sistem perawat.</li>
+<li>Modul Angsmart — tabel <code>handover_logs</code> diganti total menjadi <code>shift_reports</code> dengan kolom <code>previous_report_id</code> (self-referencing) untuk merepresentasikan rantai catatan antar-shift yang berkelanjutan, bukan serah terima formal dua pihak.</li>
+</ol>
+</blockquote>
+<hr>
+<h2>1. Asumsi &amp; Keputusan Desain</h2>
+<p>Beberapa hal di PRD ditulis ringkas (mis. <code>items_checked (JSON)</code>); untuk kebutuhan produksi, JSON tersebut dinormalisasi menjadi tabel master + detail agar bisa diaudit per-item, dicari, dan dilaporkan. Keputusan lain:</p>
+<ol>
+<li><strong>Satu tabel <code>users</code></strong> untuk semua staf (perawat Surgicon, perawat ruangan, kepala ruangan, admin/IT), dibedakan lewat <code>role_id</code>. Pasien <strong>tidak</strong> disimpan di <code>users</code> — punya jalur otentikasi sendiri (No. RM + token/tanggal lahir).</li>
+<li><strong>RBAC</strong> dimodelkan granular per modul (<code>role_module_access</code>) agar matriks RBAC (Full Akses / Lihat saja / Lihat &amp; isi / —) bisa diatur tanpa ubah kode.</li>
+<li><strong>Checklist perawat</strong> (Pre-OP &amp; Post-OP) dipecah menjadi tabel <em>master item</em> + <em>transaksi header</em> + <em>detail jawaban</em>, bukan satu kolom JSON. Pola yang sama dipakai ulang untuk <strong>checklist pemahaman guide pasien</strong> (lihat §3.2).</li>
+<li><strong>Asesmen MFS</strong> dinormalisasi ke indikator standar Morse Fall Scale (6 indikator baku) agar skor otomatis dihitung dari data terstruktur, bukan dipercaya dari input klien.</li>
+<li><strong><code>nursing_cares</code> dibuat otomatis</strong> saat pasien baru ditambahkan (trigger aplikasi/DB).</li>
+<li><strong><code>shift_reports</code> dirancang sebagai rantai catatan</strong> (bukan handover formal 2 pihak): setiap laporan baru adalah baris baru yang mereferensikan laporan sebelumnya lewat <code>previous_report_id</code>, sehingga histori &quot;perawat A → B → C → ...&quot; tertelusuri eksplisit, bukan cuma tebakan dari urutan waktu.</li>
+<li>Semua tabel transaksi punya <code>created_at</code>; tabel yang butuh audit (checklist, guide log, laporan shift) juga punya kolom yang mengarah ke <code>users.id</code> sebagai penanggung jawab.</li>
+<li>Tabel bertanda <strong>(Fase 2)</strong> tidak wajib ada di rilis MVP tapi disertakan agar skema tidak perlu migrasi besar nanti.</li>
+</ol>
+<p>Konvensi penamaan: nama tabel plural, <code>snake_case</code>, PK selalu <code>id</code>, FK selalu <code>&lt;singular_entity&gt;_id</code> (mis. <code>patient_id</code>, <code>nurse_id</code>).</p>
+<hr>
+<h2>2. Diagram ERD (Mermaid)</h2>
+<pre class="mermaid">erDiagram
+    ROLES ||--o{ USERS : &#34;has&#34;
+    ROLES ||--o{ ROLE_MODULE_ACCESS : &#34;governs&#34;
+
+    USERS ||--o{ PATIENTS : &#34;registers&#34;
+    USERS ||--o{ PREOP_VERIFICATIONS : &#34;verifies&#34;
+    USERS ||--o{ POSTOP_VERIFICATIONS : &#34;verifies&#34;
+    USERS ||--o{ NURSING_CARES : &#34;records&#34;
+    USERS ||--o{ SHIFT_REPORTS : &#34;writes&#34;
+    USERS ||--o{ NURSING_CARE_PLANS : &#34;prepares&#34;
+    USERS ||--o{ MFS_ASSESSMENTS : &#34;assesses&#34;
+    USERS ||--o{ PATIENT_GUIDE_LOGS : &#34;confirms on behalf of&#34;
+    USERS ||--o{ AUDIT_LOGS : &#34;performs action&#34;
+    USERS ||--o{ NOTIFICATIONS : &#34;receives&#34;
+
+    PATIENTS ||--o{ PATIENT_GUIDE_LOGS : &#34;has read log&#34;
+    PATIENTS ||--o{ PREOP_VERIFICATIONS : &#34;is verified&#34;
+    PATIENTS ||--o{ POSTOP_VERIFICATIONS : &#34;is verified&#34;
+    PATIENTS ||--|| NURSING_CARES : &#34;has (1 active)&#34;
+    PATIENTS ||--o{ SHIFT_REPORTS : &#34;has chained reports&#34;
+    PATIENTS ||--o{ NURSING_CARE_PLANS : &#34;has plan&#34;
+    PATIENTS ||--o{ MFS_ASSESSMENTS : &#34;is fall-risk assessed&#34;
+    PATIENTS ||--o{ PATIENT_ACCESS_TOKENS : &#34;has access token&#34;
+    PATIENTS ||--o{ NOTIFICATIONS : &#34;triggers&#34;
+
+    SHIFT_REPORTS ||--o| SHIFT_REPORTS : &#34;continues from (previous_report_id)&#34;
+
+    GUIDE_CONTENTS ||--o{ PATIENT_GUIDE_LOGS : &#34;is read via&#34;
+    GUIDE_CHECKLIST_ITEMS ||--o{ PATIENT_GUIDE_CHECKLIST_ANSWERS : &#34;referenced by&#34;
+    PATIENT_GUIDE_LOGS ||--o{ PATIENT_GUIDE_CHECKLIST_ANSWERS : &#34;consists of&#34;
+
+    VERIFICATION_ITEM_MASTER ||--o{ PREOP_VERIFICATION_DETAILS : &#34;referenced by&#34;
+    VERIFICATION_ITEM_MASTER ||--o{ POSTOP_VERIFICATION_DETAILS : &#34;referenced by&#34;
+    PREOP_VERIFICATIONS ||--o{ PREOP_VERIFICATION_DETAILS : &#34;consists of&#34;
+    POSTOP_VERIFICATIONS ||--o{ POSTOP_VERIFICATION_DETAILS : &#34;consists of&#34;
+
+    NURSING_DIAGNOSIS_MASTER ||--o{ NURSING_CARE_PLANS : &#34;referenced by&#34;
+
+    MFS_INDICATOR_MASTER ||--o{ MFS_INDICATOR_OPTIONS : &#34;has&#34;
+    MFS_INDICATOR_OPTIONS ||--o{ MFS_ASSESSMENT_DETAILS : &#34;chosen in&#34;
+    MFS_ASSESSMENTS ||--o{ MFS_ASSESSMENT_DETAILS : &#34;consists of&#34;
+
+    EDUCATION_VIDEOS {
+        int id PK
+    }
+    DOCTORS {
+        int id PK
+    }
+    TESTIMONIALS {
+        int id PK
+    }
+    LANDING_CONTENTS {
+        int id PK
+    }
+</pre>
+<blockquote>
+<p>Catatan: <code>EDUCATION_VIDEOS</code>, <code>DOCTORS</code>, <code>TESTIMONIALS</code>, <code>LANDING_CONTENTS</code> sengaja berdiri sendiri (tidak ber-FK ke Patients/Users) karena sifatnya konten publik landing page yang dikelola Admin/IT, bukan data klinis.</p>
+</blockquote>
+<hr>
+<h2>3. Kamus Tabel Lengkap</h2>
+<h3>3.1 Identitas, RBAC &amp; Master Data</h3>
+<p><strong><code>roles</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>role_name</td>
+<td>VARCHAR(50), UNIQUE</td>
+<td>Surgicon Nurse, Ward Nurse, Fall-Risk Assessor Nurse, Head Nurse/Supervisor, Admin/IT</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>users</code></strong> (seluruh staf)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>role_id</td>
+<td>INT, FK → roles.id</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>email</td>
+<td>VARCHAR(150), UNIQUE</td>
+<td></td>
+</tr>
+<tr>
+<td>username</td>
+<td>VARCHAR(50), UNIQUE</td>
+<td></td>
+</tr>
+<tr>
+<td>password_hash</td>
+<td>VARCHAR(255)</td>
+<td></td>
+</tr>
+<tr>
+<td>license_number</td>
+<td>VARCHAR(50), NULLABLE</td>
+<td>No. STR/SIP tenaga medis</td>
+</tr>
+<tr>
+<td>work_unit</td>
+<td>VARCHAR(100), NULLABLE</td>
+<td>OK, Ruang Rawat Inap, dst.</td>
+</tr>
+<tr>
+<td>is_active</td>
+<td>BOOLEAN, DEFAULT true</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at, updated_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>role_module_access</code></strong> (matriks RBAC)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>role_id</td>
+<td>INT, FK → roles.id</td>
+<td></td>
+</tr>
+<tr>
+<td>module</td>
+<td>ENUM('SURGICON','ANGSMART','ANSAFE','LANDING_ADMIN')</td>
+<td></td>
+</tr>
+<tr>
+<td>access_level</td>
+<td>ENUM('NONE','VIEW','VIEW_INPUT','FULL')</td>
+<td></td>
+</tr>
+<tr>
+<td>UNIQUE(role_id, module)</td>
+<td></td>
+<td>Constraint komposit</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>patients</code></strong> (Master Data — jantung integrasi ketiga modul)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT/UUID, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>medical_record_no</td>
+<td>VARCHAR(30), UNIQUE, NOT NULL</td>
+<td>No. RM — validasi unik lintas ekosistem</td>
+</tr>
+<tr>
+<td>name</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>date_of_birth</td>
+<td>DATE</td>
+<td>dipakai untuk umur &amp; otentikasi pasien</td>
+</tr>
+<tr>
+<td>gender</td>
+<td>ENUM('M','F')</td>
+<td></td>
+</tr>
+<tr>
+<td>room_bed</td>
+<td>VARCHAR(20), NULLABLE</td>
+<td></td>
+</tr>
+<tr>
+<td>diagnosis</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>procedure_type</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>phase_status</td>
+<td>ENUM('PRE_OP','INTRA_OP','POST_OP','INPATIENT_CARE','DISCHARGED')</td>
+<td>sumber kebenaran status card di Beranda Surgicon/Angsmart</td>
+</tr>
+<tr>
+<td>surgery_schedule</td>
+<td>DATETIME, NULLABLE</td>
+<td>dipakai logika alert &quot;&lt; 2 jam belum baca guide&quot;</td>
+</tr>
+<tr>
+<td>patient_access_code</td>
+<td>VARCHAR(20), UNIQUE</td>
+<td>token akses portal pasien</td>
+</tr>
+<tr>
+<td>created_by</td>
+<td>INT, FK → users.id</td>
+<td>perawat yang mendaftarkan</td>
+</tr>
+<tr>
+<td>created_at, updated_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>patient_access_tokens</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id</td>
+<td></td>
+</tr>
+<tr>
+<td>token</td>
+<td>VARCHAR(64), UNIQUE</td>
+<td></td>
+</tr>
+<tr>
+<td>expired_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+<tr>
+<td>is_used</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3>3.2 Modul Surgicon</h3>
+<p><strong><code>guide_contents</code></strong> (materi Pre-OP/Post-OP Guide)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>guide_type</td>
+<td>ENUM('PRE_OP','POST_OP')</td>
+<td></td>
+</tr>
+<tr>
+<td>title</td>
+<td>VARCHAR(200)</td>
+<td></td>
+</tr>
+<tr>
+<td>content</td>
+<td>TEXT/JSON</td>
+<td>teks, gambar, atau video embed</td>
+</tr>
+<tr>
+<td>sort_order</td>
+<td>INT</td>
+<td>urutan tampil poin panduan</td>
+</tr>
+<tr>
+<td>is_published</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>patient_guide_logs</code></strong> <em>(diperbarui di v1.2)</em></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id</td>
+<td></td>
+</tr>
+<tr>
+<td>guide_content_id</td>
+<td>INT, FK → guide_contents.id, NULLABLE</td>
+<td>versi guide yang dibaca</td>
+</tr>
+<tr>
+<td>guide_type</td>
+<td>ENUM('PRE_OP','POST_OP')</td>
+<td></td>
+</tr>
+<tr>
+<td>is_read</td>
+<td>BOOLEAN, DEFAULT false</td>
+<td></td>
+</tr>
+<tr>
+<td>read_at</td>
+<td>TIMESTAMP, NULLABLE</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>checklist_status</strong></td>
+<td><strong>ENUM('NOT_STARTED','IN_PROGRESS','COMPLETED'), DEFAULT 'NOT_STARTED'</strong></td>
+<td><strong>[BARU]</strong> otomatis <code>COMPLETED</code> saat semua poin di <code>patient_guide_checklist_answers</code> tercentang</td>
+</tr>
+<tr>
+<td><strong>checklist_completed_at</strong></td>
+<td><strong>TIMESTAMP, NULLABLE</strong></td>
+<td><strong>[BARU]</strong> waktu status berubah jadi <code>COMPLETED</code></td>
+</tr>
+<tr>
+<td>checked_by_nurse</td>
+<td>BOOLEAN, DEFAULT false</td>
+<td>skenario perawat bantu centang atas konfirmasi lisan</td>
+</tr>
+<tr>
+<td>confirmed_by_user_id</td>
+<td>INT, FK → users.id, NULLABLE</td>
+<td>wajib diisi jika <code>checked_by_nurse = true</code></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>guide_checklist_items</code></strong> <em>(tabel baru — master poin checklist &quot;sudah memahami guide&quot;)</em></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>guide_type</td>
+<td>ENUM('PRE_OP','POST_OP')</td>
+<td></td>
+</tr>
+<tr>
+<td>item_text</td>
+<td>VARCHAR(255)</td>
+<td>mis. &quot;Saya paham prosedur puasa sebelum operasi&quot;</td>
+</tr>
+<tr>
+<td>sort_order</td>
+<td>INT</td>
+<td></td>
+</tr>
+<tr>
+<td>is_active</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>patient_guide_checklist_answers</code></strong> <em>(tabel baru — jawaban pasien per poin checklist)</em></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_guide_log_id</td>
+<td>INT, FK → patient_guide_logs.id</td>
+<td></td>
+</tr>
+<tr>
+<td>checklist_item_id</td>
+<td>INT, FK → guide_checklist_items.id</td>
+<td></td>
+</tr>
+<tr>
+<td>is_checked</td>
+<td>BOOLEAN, DEFAULT false</td>
+<td></td>
+</tr>
+<tr>
+<td>checked_at</td>
+<td>TIMESTAMP, NULLABLE</td>
+<td></td>
+</tr>
+<tr>
+<td>UNIQUE(patient_guide_log_id, checklist_item_id)</td>
+<td></td>
+<td>satu jawaban per poin per log</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>verification_item_master</code></strong> (daftar poin checklist perawat, dipakai Pre-OP &amp; Post-OP)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>ENUM('PRE_OP','POST_OP')</td>
+<td></td>
+</tr>
+<tr>
+<td>item_name</td>
+<td>VARCHAR(200)</td>
+<td>mis. &quot;Identity verified&quot;, &quot;Fasting status&quot;, &quot;Surgical site marking&quot;</td>
+</tr>
+<tr>
+<td>sort_order</td>
+<td>INT</td>
+<td></td>
+</tr>
+<tr>
+<td>is_active</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>preop_verifications</code></strong> (header transaksi)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id</td>
+<td></td>
+</tr>
+<tr>
+<td>nurse_id</td>
+<td>INT, FK → users.id</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>ENUM('DRAFT','COMPLETED')</td>
+<td>&quot;Completed&quot; memicu perubahan <code>patients.phase_status</code> → INTRA_OP</td>
+</tr>
+<tr>
+<td>notes</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>recorded_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>preop_verification_details</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>preop_verification_id</td>
+<td>INT, FK → preop_verifications.id</td>
+<td></td>
+</tr>
+<tr>
+<td>item_master_id</td>
+<td>INT, FK → verification_item_master.id</td>
+<td></td>
+</tr>
+<tr>
+<td>is_checked</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+<tr>
+<td>item_note</td>
+<td>VARCHAR(255), NULLABLE</td>
+<td></td>
+</tr>
+<tr>
+<td>UNIQUE(preop_verification_id, item_master_id)</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>postop_verifications</code></strong> &amp; <strong><code>postop_verification_details</code></strong> — struktur identik dengan pasangan Pre-OP di atas (header + detail), merujuk <code>verification_item_master</code> dengan <code>type = 'POST_OP'</code>. &quot;Completed&quot; pada tabel ini memicu <code>patients.phase_status</code> → INPATIENT_CARE.</p>
+<hr>
+<h3>3.3 Modul Angsmart</h3>
+<p><strong><code>nursing_cares</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id</td>
+<td>dibuat otomatis saat pasien baru diinput di Surgicon</td>
+</tr>
+<tr>
+<td>nurse_id</td>
+<td>INT, FK → users.id</td>
+<td></td>
+</tr>
+<tr>
+<td>care_actions</td>
+<td>TEXT</td>
+<td>daftar tindakan keperawatan</td>
+</tr>
+<tr>
+<td>shift</td>
+<td>ENUM('MORNING','AFTERNOON','NIGHT')</td>
+<td></td>
+</tr>
+<tr>
+<td>care_status</td>
+<td>ENUM('IN_CARE','AWAITING_ACTION','NEEDS_HANDOVER','COMPLETED')</td>
+<td>sumber pie chart Dashboard</td>
+</tr>
+<tr>
+<td>notes</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>shift_reports</code></strong> <em>(pengganti <code>handover_logs</code> di v1.2 — rantai catatan antar-shift)</em></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id</td>
+<td></td>
+</tr>
+<tr>
+<td>nurse_id</td>
+<td>INT, FK → users.id</td>
+<td>perawat penulis laporan (pada shift-nya sendiri)</td>
+</tr>
+<tr>
+<td>shift</td>
+<td>ENUM('MORNING','AFTERNOON','NIGHT')</td>
+<td>shift saat laporan ditulis</td>
+</tr>
+<tr>
+<td><strong>previous_report_id</strong></td>
+<td><strong>INT, FK → shift_reports.id, NULLABLE</strong></td>
+<td><strong>[BARU]</strong> laporan sebelumnya yang dilanjutkan; <code>NULL</code> = laporan pertama untuk pasien tsb. Inilah yang membentuk rantai &quot;perawat A → B → C → ...&quot; secara eksplisit di level data</td>
+</tr>
+<tr>
+<td>report_content</td>
+<td>TEXT</td>
+<td>catatan bebas dari perawat untuk perawat shift berikutnya</td>
+</tr>
+<tr>
+<td>is_locked</td>
+<td>BOOLEAN, DEFAULT true saat submit</td>
+<td>laporan yang sudah dikirim tidak bisa diedit; perawat berikutnya menambah baris baru, bukan mengubah yang lama</td>
+</tr>
+<tr>
+<td>recorded_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Kolom <code>combined_summary</code>, <code>shift_from</code>, <code>shift_to</code> dari desain lama <strong>dihapus</strong> — konsep &quot;serah terima formal 2 pihak&quot; digantikan rantai catatan bebas yang bisa terus bersambung (&gt;2 pihak) lewat <code>previous_report_id</code>.</p>
+</blockquote>
+<p><strong><code>nursing_diagnosis_master</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>diagnosis_code</td>
+<td>VARCHAR(20), NULLABLE</td>
+<td></td>
+</tr>
+<tr>
+<td>diagnosis_name</td>
+<td>VARCHAR(255)</td>
+<td></td>
+</tr>
+<tr>
+<td>goal</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>intervention</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at, updated_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>nursing_care_plans</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id</td>
+<td></td>
+</tr>
+<tr>
+<td>diagnosis_id</td>
+<td>INT, FK → nursing_diagnosis_master.id</td>
+<td>memicu auto-fill goal &amp; intervention</td>
+</tr>
+<tr>
+<td>nurse_id</td>
+<td>INT, FK → users.id</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>ENUM('ACTIVE','COMPLETED','CANCELLED')</td>
+<td></td>
+</tr>
+<tr>
+<td>start_date</td>
+<td>DATE</td>
+<td></td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3>3.4 Modul ANSafe</h3>
+<p><strong><code>mfs_indicator_master</code></strong> (6 indikator baku Morse Fall Scale)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>indicator_name</td>
+<td>VARCHAR(150)</td>
+<td>History of falling, Secondary diagnosis, Ambulatory aid, IV/heparin lock therapy, Gait, Mental status</td>
+</tr>
+<tr>
+<td>sort_order</td>
+<td>INT</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>mfs_indicator_options</code></strong> (pilihan jawaban + bobot skor per indikator)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>indicator_id</td>
+<td>INT, FK → mfs_indicator_master.id</td>
+<td></td>
+</tr>
+<tr>
+<td>option_label</td>
+<td>VARCHAR(150)</td>
+<td>mis. &quot;No&quot;, &quot;Yes&quot;</td>
+</tr>
+<tr>
+<td>score</td>
+<td>INT</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>mfs_assessments</code></strong> (header)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id</td>
+<td></td>
+</tr>
+<tr>
+<td>nurse_id</td>
+<td>INT, FK → users.id</td>
+<td></td>
+</tr>
+<tr>
+<td>total_score</td>
+<td>INT</td>
+<td>dihitung otomatis dari detail</td>
+</tr>
+<tr>
+<td>risk_category</td>
+<td>ENUM('LOW','MODERATE','HIGH')</td>
+<td>0–24 / 25–44 / ≥45, dihitung server-side</td>
+</tr>
+<tr>
+<td>shift</td>
+<td>ENUM('MORNING','AFTERNOON','NIGHT'), NULLABLE</td>
+<td>untuk KPI &quot;ter-asesmen tiap shift&quot;</td>
+</tr>
+<tr>
+<td>recorded_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>mfs_assessment_details</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>mfs_assessment_id</td>
+<td>INT, FK → mfs_assessments.id</td>
+<td></td>
+</tr>
+<tr>
+<td>indicator_id</td>
+<td>INT, FK → mfs_indicator_master.id</td>
+<td></td>
+</tr>
+<tr>
+<td>option_id</td>
+<td>INT, FK → mfs_indicator_options.id</td>
+<td></td>
+</tr>
+<tr>
+<td>UNIQUE(mfs_assessment_id, indicator_id)</td>
+<td></td>
+<td>satu jawaban per indikator per asesmen</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>education_videos</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>title</td>
+<td>VARCHAR(200)</td>
+<td></td>
+</tr>
+<tr>
+<td>category</td>
+<td>ENUM('PATIENT','FAMILY','SAFETY_TIPS')</td>
+<td>filter &quot;Semua&quot; = tanpa WHERE category</td>
+</tr>
+<tr>
+<td>embed_url</td>
+<td>VARCHAR(255)</td>
+<td></td>
+</tr>
+<tr>
+<td>duration_seconds</td>
+<td>INT</td>
+<td></td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>is_published</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3>3.5 Landing Page &amp; Lintas Modul</h3>
+<p><strong><code>doctors</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>specialty</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>practice_schedule</td>
+<td>TEXT/JSON</td>
+<td></td>
+</tr>
+<tr>
+<td>photo_url</td>
+<td>VARCHAR(255)</td>
+<td></td>
+</tr>
+<tr>
+<td>is_active</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>testimonials</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>patient_name</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>testimonial_text</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>rating</td>
+<td>TINYINT</td>
+<td></td>
+</tr>
+<tr>
+<td>is_published</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>partners</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>partner_name</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>logo_url</td>
+<td>VARCHAR(255)</td>
+<td></td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>landing_contents</code></strong> (CMS ringan: hero, profil, visi-misi)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>section_key</td>
+<td>VARCHAR(50), UNIQUE</td>
+<td>'hero', 'profile', 'vision_mission', 'facilities'</td>
+</tr>
+<tr>
+<td>title</td>
+<td>VARCHAR(200)</td>
+<td></td>
+</tr>
+<tr>
+<td>content</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>updated_by</td>
+<td>INT, FK → users.id</td>
+<td></td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>audit_logs</code></strong> (kebutuhan NFR — Audit Trail)</p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>INT, FK → users.id, NULLABLE</td>
+<td>null jika aksi dari sisi pasien</td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id, NULLABLE</td>
+<td></td>
+</tr>
+<tr>
+<td>action</td>
+<td>VARCHAR(100)</td>
+<td>mis. &quot;PREOP_VERIFICATION_SUBMIT&quot;</td>
+</tr>
+<tr>
+<td>entity_name</td>
+<td>VARCHAR(100)</td>
+<td>nama tabel terdampak</td>
+</tr>
+<tr>
+<td>entity_id</td>
+<td>INT</td>
+<td></td>
+</tr>
+<tr>
+<td>detail</td>
+<td>JSON</td>
+<td>payload perubahan (before/after) — satu-satunya JSON yang memang tepat dipakai di sini karena sifatnya log, bukan data operasional</td>
+</tr>
+<tr>
+<td>ip_address</td>
+<td>VARCHAR(45)</td>
+<td></td>
+</tr>
+<tr>
+<td>recorded_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>notifications</code></strong> <em>(Fase 2 — alert otomatis, termasuk forward hasil guide checklist ke perawat)</em></p>
+<table>
+<thead>
+<tr>
+<th>Kolom</th>
+<th>Tipe</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT, PK</td>
+<td></td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>INT, FK → users.id, NULLABLE</td>
+<td>penerima (perawat)</td>
+</tr>
+<tr>
+<td>patient_id</td>
+<td>INT, FK → patients.id, NULLABLE</td>
+<td>pemicu</td>
+</tr>
+<tr>
+<td>type</td>
+<td>ENUM('GUIDE_NOT_READ_ALERT','PATIENT_GUIDE_CHECKLIST_COMPLETED','INFO', ...)</td>
+<td></td>
+</tr>
+<tr>
+<td>title</td>
+<td>VARCHAR(150)</td>
+<td></td>
+</tr>
+<tr>
+<td>message</td>
+<td>TEXT</td>
+<td></td>
+</tr>
+<tr>
+<td>is_read</td>
+<td>BOOLEAN</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TIMESTAMP</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>4. Ringkasan Relasi &amp; Kardinalitas</h2>
+<table>
+<thead>
+<tr>
+<th>Entitas Induk</th>
+<th>Kardinalitas</th>
+<th>Entitas Anak</th>
+<th>Catatan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>roles</td>
+<td>1 — N</td>
+<td>users</td>
+<td>satu role dipakai banyak staf</td>
+</tr>
+<tr>
+<td>roles</td>
+<td>1 — N</td>
+<td>role_module_access</td>
+<td>matriks RBAC per modul</td>
+</tr>
+<tr>
+<td>users (nurse)</td>
+<td>1 — N</td>
+<td>patients</td>
+<td><code>created_by</code></td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — N</td>
+<td>patient_guide_logs</td>
+<td>riwayat baca Pre-OP &amp; Post-OP</td>
+</tr>
+<tr>
+<td>guide_contents</td>
+<td>1 — N</td>
+<td>patient_guide_logs</td>
+<td>versi konten yang dibaca</td>
+</tr>
+<tr>
+<td>guide_checklist_items</td>
+<td>1 — N</td>
+<td>patient_guide_checklist_answers</td>
+<td>acuan poin checklist</td>
+</tr>
+<tr>
+<td>patient_guide_logs</td>
+<td>1 — N</td>
+<td>patient_guide_checklist_answers</td>
+<td>header–detail; semua tercentang → <code>checklist_status = COMPLETED</code></td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — N</td>
+<td>preop_verifications</td>
+<td>biasanya 1 aktif, histori tetap N</td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — N</td>
+<td>postop_verifications</td>
+<td>idem</td>
+</tr>
+<tr>
+<td>verification_item_master</td>
+<td>1 — N</td>
+<td>preop_verification_details / postop_verification_details</td>
+<td>acuan poin checklist perawat</td>
+</tr>
+<tr>
+<td>preop_verifications / postop_verifications</td>
+<td>1 — N</td>
+<td>*_details</td>
+<td>header–detail</td>
+</tr>
+<tr>
+<td>users (nurse)</td>
+<td>1 — N</td>
+<td>preop_verifications / postop_verifications</td>
+<td>siapa yang memverifikasi</td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — 1 (aktif) / 1 — N (historis)</td>
+<td>nursing_cares</td>
+<td>dibuat otomatis saat registrasi</td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — N</td>
+<td>shift_reports</td>
+<td>rantai catatan tiap shift</td>
+</tr>
+<tr>
+<td>shift_reports</td>
+<td>0 — 1</td>
+<td>shift_reports (self)</td>
+<td><code>previous_report_id</code> → laporan sebelumnya dalam rantai</td>
+</tr>
+<tr>
+<td>nursing_diagnosis_master</td>
+<td>1 — N</td>
+<td>nursing_care_plans</td>
+<td>auto-fill goal/intervention</td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — N</td>
+<td>nursing_care_plans</td>
+<td></td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — N</td>
+<td>mfs_assessments</td>
+<td>tiap shift → banyak asesmen</td>
+</tr>
+<tr>
+<td>mfs_assessments</td>
+<td>1 — N</td>
+<td>mfs_assessment_details</td>
+<td>6 indikator per asesmen</td>
+</tr>
+<tr>
+<td>mfs_indicator_master</td>
+<td>1 — N</td>
+<td>mfs_indicator_options</td>
+<td>opsi jawaban &amp; bobot skor</td>
+</tr>
+<tr>
+<td>mfs_indicator_options</td>
+<td>1 — N</td>
+<td>mfs_assessment_details</td>
+<td>jawaban yang dipilih</td>
+</tr>
+<tr>
+<td>patients</td>
+<td>1 — N</td>
+<td>patient_access_tokens</td>
+<td>token bisa berganti (kadaluarsa)</td>
+</tr>
+<tr>
+<td>users</td>
+<td>1 — N</td>
+<td>audit_logs, notifications</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Semua relasi di atas <strong>N-sisi anak wajib punya FK NOT NULL</strong> ke <code>patients.id</code>, kecuali <code>audit_logs.patient_id</code>, <code>notifications.patient_id</code>, dan <code>shift_reports.previous_report_id</code> yang nullable.</p>
+<hr>
+<h2>5. Aturan Bisnis yang Mempengaruhi Skema</h2>
+<ol>
+<li><strong>Auto-provisioning lintas modul</strong>: trigger aplikasi pada <code>INSERT patients</code> → otomatis <code>INSERT nursing_cares</code> (status awal <code>AWAITING_ACTION</code>).</li>
+<li><strong>Validasi No. RM unik</strong>: <code>UNIQUE</code> constraint di <code>patients.medical_record_no</code>, dicek di level DB bukan hanya aplikasi.</li>
+<li><strong>Status &quot;Completed&quot; checklist perawat</strong> mengunci perubahan fase pasien: semua baris <code>preop_verification_details.is_checked = true</code> untuk <code>preop_verification_id</code> tertentu harus true sebelum <code>status</code> bisa diubah ke <code>COMPLETED</code>.</li>
+<li><strong>Guide checklist pasien selesai otomatis</strong>: trigger aplikasi mengecek — semua <code>guide_checklist_items.is_active = true</code> untuk <code>guide_type</code> tertentu sudah punya baris <code>patient_guide_checklist_answers.is_checked = true</code> yang berpasangan? Jika ya → <code>patient_guide_logs.checklist_status = 'COMPLETED'</code>, <code>checklist_completed_at = NOW()</code>, lalu insert baris ke <code>notifications</code> (<code>type = 'PATIENT_GUIDE_CHECKLIST_COMPLETED'</code>) untuk perawat penanggung jawab pasien.</li>
+<li><strong>Badge peringatan real-time</strong>: dihitung on-the-fly dari <code>patients.surgery_schedule</code> − NOW() &lt; 2 jam DAN <code>patient_guide_logs.is_read = false</code> untuk <code>guide_type = 'PRE_OP'</code>.</li>
+<li><strong>Rantai shift report tidak bisa diedit</strong>: begitu <code>shift_reports.is_locked = true</code>, baris jadi read-only di level aplikasi (bisa diperkuat trigger <code>BEFORE UPDATE</code> di DB). Perawat shift berikutnya <strong>selalu menambah baris baru</strong> dengan <code>previous_report_id</code> menunjuk ke laporan terakhir pasien tsb — riwayat lengkap didapat dengan traversal <code>previous_report_id</code> atau cukup <code>ORDER BY recorded_at ASC WHERE patient_id = ?</code>.</li>
+<li><strong>Skor MFS dihitung server-side</strong> dari <code>SUM(mfs_indicator_options.score)</code> di <code>mfs_assessment_details</code>, disimpan sebagai <em>cache</em> di <code>mfs_assessments.total_score</code> agar query dashboard cepat, tapi tetap bisa direkalkulasi ulang untuk audit.</li>
+</ol>
+<hr>
+<h2>6. Rekomendasi Index</h2>
+<table>
+<thead>
+<tr>
+<th>Tabel</th>
+<th>Index</th>
+<th>Alasan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>patients</td>
+<td><code>medical_record_no</code> (UNIQUE), <code>phase_status</code>, <code>surgery_schedule</code></td>
+<td>pencarian cepat + query alert real-time</td>
+</tr>
+<tr>
+<td>patient_guide_logs</td>
+<td><code>(patient_id, guide_type)</code></td>
+<td>fitur Monitoring Akun Pasien</td>
+</tr>
+<tr>
+<td>patient_guide_checklist_answers</td>
+<td><code>(patient_guide_log_id)</code></td>
+<td>cek kelengkapan checklist per log</td>
+</tr>
+<tr>
+<td>preop_verifications / postop_verifications</td>
+<td><code>(patient_id, status)</code></td>
+<td>List Pasien Pre-OP/Post-OP</td>
+</tr>
+<tr>
+<td>nursing_cares</td>
+<td><code>(patient_id, care_status)</code></td>
+<td>pie chart Dashboard Angsmart</td>
+</tr>
+<tr>
+<td>shift_reports</td>
+<td><code>(patient_id, recorded_at DESC)</code>, <code>previous_report_id</code></td>
+<td>menarik rantai laporan pasien secara cepat &amp; berurutan</td>
+</tr>
+<tr>
+<td>mfs_assessments</td>
+<td><code>(patient_id, recorded_at DESC)</code></td>
+<td>riwayat asesmen per pasien</td>
+</tr>
+<tr>
+<td>audit_logs</td>
+<td><code>(entity_name, entity_id)</code>, <code>recorded_at</code></td>
+<td>penelusuran audit</td>
+</tr>
+<tr>
+<td>education_videos</td>
+<td><code>category</code></td>
+<td>filter Education Center tanpa reload</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>7. Ringkasan Jumlah Entitas</h2>
+<ul>
+<li><strong>Master &amp; Identitas:</strong> <code>roles</code>, <code>users</code>, <code>role_module_access</code>, <code>patients</code>, <code>patient_access_tokens</code> (5)</li>
+<li><strong>Surgicon:</strong> <code>guide_contents</code>, <code>patient_guide_logs</code>, <code>guide_checklist_items</code>, <code>patient_guide_checklist_answers</code>, <code>verification_item_master</code>, <code>preop_verifications</code>, <code>preop_verification_details</code>, <code>postop_verifications</code>, <code>postop_verification_details</code> (9)</li>
+<li><strong>Angsmart:</strong> <code>nursing_cares</code>, <code>shift_reports</code>, <code>nursing_diagnosis_master</code>, <code>nursing_care_plans</code> (4)</li>
+<li><strong>ANSafe:</strong> <code>mfs_indicator_master</code>, <code>mfs_indicator_options</code>, <code>mfs_assessments</code>, <code>mfs_assessment_details</code>, <code>education_videos</code> (5)</li>
+<li><strong>Landing &amp; Lintas Modul:</strong> <code>doctors</code>, <code>testimonials</code>, <code>partners</code>, <code>landing_contents</code>, <code>audit_logs</code>, <code>notifications</code> (6)</li>
+</ul>
+<p><strong>Total: 29 tabel</strong> (bertambah 2 dari v1.1: <code>guide_checklist_items</code> &amp; <code>patient_guide_checklist_answers</code>; jumlah tabel Angsmart tetap 4 karena <code>handover_logs</code> diganti nama &amp; struktur menjadi <code>shift_reports</code>, bukan ditambah).</p>
+
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="/_runtime/mermaid-11.16.1.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+</body></html>
