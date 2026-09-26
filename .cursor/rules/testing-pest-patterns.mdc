@@ -1,0 +1,94 @@
+---
+description: Pest patterns — datasets, assertions, fakes, mocking, fixtures
+globs: tests/**
+alwaysApply: false
+---
+
+
+## Datasets — parameterized tests
+
+For boundary/validation tests that vary only by inputs, **SHOULD** use a Pest dataset rather than copy-pasting near-identical tests:
+
+```php
+it('rejects invalid emails', function (string $email) {
+    expect(fn () => User::factory()->create(['email' => $email]))
+        ->toThrow(ValidationException::class);
+})->with([
+    'empty'       => '',
+    'no at sign'  => 'not-an-email',
+    'no tld'      => 'user@example',
+    'spaces'      => 'a b@c.com',
+]);
+```
+
+## Useful assertions
+
+- **`assertSoftDeleted('posts', ['id' => $post->id])`** — soft delete happened.
+- **`assertModelExists` / `assertModelMissing`** — model-aware existence; clearer than bare `assertDatabaseHas`.
+- **`assertJsonStructure([...])`** — pin response shape (including any project pagination envelope).
+
+## Auth — Sanctum + abilities
+
+When testing token-scoped endpoints, **MUST** test both granted and missing abilities:
+
+```php
+use Laravel\Sanctum\Sanctum;
+
+Sanctum::actingAs($user, ['posts:write']);
+$this->postJson('/api/posts', $payload)->assertCreated();
+
+Sanctum::actingAs($user, []); // no abilities
+$this->postJson('/api/posts', $payload)->assertForbidden();
+```
+
+## Selective fakes
+
+Prefer allowlisted fakes over blanket fakes so unrelated listeners stay live:
+
+```php
+Event::fake([OrderShipped::class]);
+Notification::fake();
+Storage::fake('s3');
+
+Notification::assertSentTo($user, OrderShipped::class);
+Storage::disk('s3')->assertExists("invoices/{$order->id}.pdf");
+```
+
+## Mocking
+
+Mock external boundaries (HTTP, mail, queue, filesystem, third-party SDKs). **AVOID** mocking your own application classes — refactor instead.
+
+```php
+Http::fake([
+    'google.com/*' => Http::response('foo@gmail.com', 200),
+]);
+
+$response = resolve(FetchGoogleUserEmailAction::class)->handle();
+
+expect($response)->toBe('foo@gmail.com');
+```
+
+**MUST** call `Http::preventStrayRequests()` in test setup when mocking an external API — any unmatched request will throw instead of silently hitting the real endpoint.
+
+```php
+use function Pest\Laravel\mock;
+
+mock(Client::class)
+    ->shouldReceive('acceptOrder')
+    ->withArgs(fn ($givenOrder) => $givenOrder->is($order))
+    ->once()
+    ->andReturn(true);
+```
+
+## Fixtures
+
+Static files used as test input (XML payloads, JSON snapshots, sample uploads).
+
+- **MUST** place under `tests/fixtures/`.
+- **SHOULD** reference via `base_path('tests/fixtures/...')` rather than relative paths.
+
+```php
+$payment = base_path('tests/fixtures/payment.xml');
+
+app(ProcessPaymentAction::class)->handle($payment, /* ... */);
+```

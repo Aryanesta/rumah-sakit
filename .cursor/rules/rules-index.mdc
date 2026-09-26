@@ -1,0 +1,10 @@
+---
+description: "Rules map — database, HTTP, domain, async, frontend, tests, core. Use @rules-index when unsure which .mdc applies. Full table in .cursor/rules/README.md"
+alwaysApply: false
+---
+
+# Rules index
+
+See **`.cursor/rules/README.md`** for the glob → `.mdc` table.
+
+Quick domains: `database-*`, `http-*`, `domain-*`, `async-*`, `frontend-*`, `testing-*`, `core-*`, `app-*` (intelligent), `reference-livewire`, `00-project-bootstrap` (always on).

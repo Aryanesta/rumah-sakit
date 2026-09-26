@@ -1,0 +1,19 @@
+---
+description: Where application logic belongs — Action vs Job vs Event vs Service vs Support
+alwaysApply: false
+---
+
+# Application logic placement
+
+All rules below are **MUST** unless tagged **SHOULD** / **PREFER** / **AVOID**.
+
+## Where does logic go?
+
+| Situation                                                        | Use                                  |
+| ---------------------------------------------------------------- | ------------------------------------ |
+| Synchronous business operation — the caller needs the result     | Action (`app/Actions/`)              |
+| Work that can run later, off the request path                    | Job (`app/Jobs/`)                    |
+| One occurrence, several unrelated side effects (fan-out)         | Event + Listeners (`app/Events/`)    |
+| Telling a user something via mail / database / SMS / broadcast   | Notification (`app/Notifications/`)  |
+| Wrapping an external system / SDK, or a cohesive multi-method capability | Service (`app/Services/`)    |
+| Stateless helper with no side effects                            | Support class (`app/Support/`)       |

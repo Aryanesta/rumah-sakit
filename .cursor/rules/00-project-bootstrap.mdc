@@ -1,0 +1,33 @@
+---
+description: Project bootstrap — Sail, skills, Cursor rules workflow
+alwaysApply: true
+---
+
+# Project bootstrap
+
+## Commands
+
+- Run PHP, Artisan, Composer, and Node through **`vendor/bin/sail`** (this app uses Laravel Sail).
+- Prefer Laravel Boost MCP tools (`search-docs`, `database-schema`, `get-absolute-url`) over guessing framework APIs.
+
+## Skills
+
+- Activate the matching skill under **`.claude/skills/`** before work in that domain (Laravel PHP, Tailwind, testing, Cloud deploy, etc.).
+
+## Rules in this repo
+
+- **All conventions live in `.cursor/rules/*.mdc`.** File-scoped rules auto-attach when matching paths are in context.
+- For the full glob map, read **`.cursor/rules/README.md`** or `@rules-index` in chat.
+- Cross-cutting topics: **`grep -rin 'keyword' .cursor/rules`**
+- When a **specific glob rule** conflicts with an intelligent/cross-cutting rule, **follow the specific rule**.
+
+## Recording new conventions
+
+- Add or edit the relevant **`.mdc`** with correct `globs` and a concise body.
+- Only when the **user explicitly asks** to record a rule — not as a summary of work you just did.
+- Do **not** recreate `.ai/rules`; this repo uses Cursor rules only.
+
+## Before editing code
+
+- Read every **matching** `.mdc` for paths you will touch.
+- Follow **`AGENTS.md`** Laravel Boost guidelines (Pint on dirty PHP, tests for behaviour changes).
