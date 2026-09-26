@@ -29,6 +29,30 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Nurse demo user
+        User::updateOrCreate(
+            ['email' => 'nurse@rumahsakit.com'],
+            [
+                'name' => 'Ns. Siti Rahma, S.Kep',
+                'username' => 'nurse',
+                'role' => UserRole::Nurse,
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Patient demo user
+        User::updateOrCreate(
+            ['email' => 'pasien@rumahsakit.com'],
+            [
+                'name' => 'Budi Santoso',
+                'username' => 'pasien',
+                'role' => UserRole::Patient,
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+
         // Standard user
         User::updateOrCreate(
             ['email' => 'test@example.com'],
@@ -40,5 +64,6 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
     }
 }

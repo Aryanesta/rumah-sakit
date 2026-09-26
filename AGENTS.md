@@ -36,6 +36,10 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `vendor/bin/sail npm run build`, `vendor/bin/sail npm run dev`, or `vendor/bin/sail composer run dev`. Ask them.
 
+## Frontend Development Focus
+
+- Do not run Docker, Sail, Git, test runners, or unnecessary environment commands when developing frontend. Focus strictly on the design, layout, markup, and visual aesthetics itself.
+
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
@@ -72,8 +76,8 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Project Rules
 
-- This project contains committed, area-grouped rules in `.ai/rules` when that directory exists (settled decisions, non-obvious traps, standing constraints). Framework and package guidelines that only apply to specific paths (testing, frontend, components) also live there, under `.ai/rules/boost` — this is not just recorded decisions, it is load-bearing guidance you have not seen inline. Before you enter plan mode or create/edit any file, you MUST first: open @.ai/rules/index.md (it maps file globs to rule files), read every rule file whose globs cover the path(s) in scope, and run `grep -rin 'keyword' .ai/rules` to catch what a path match alone misses. Do not write code until you have read and are following every matching rule. If `.ai/rules` does not exist, continue without it.
-- Record a rule with `record-rule` only when the user explicitly asks for one. Instructions for the work at hand are not rules, no matter how emphatic: "remove this typo", "use X here" are work to do, not rules to record. Never record a rule on your own initiative, as a byproduct of a change, or to summarize what you just did. When the user does ask, pass a `glob` (e.g. `app/Http/Controllers/**`), a short `title`, and a few-line `note`. Use `record-rule` rather than your native memory or notes tool, because native memory is personal and session-scoped, while only `.ai/rules` is shared with the team and persists in the repo.
+- This project stores conventions in **`.cursor/rules/*.mdc`** (settled decisions, non-obvious traps, standing constraints). Cursor auto-attaches rules whose `globs` match files in context; `00-project-bootstrap.mdc` is always on. Before you enter plan mode or create/edit any file, you MUST read every matching `.mdc` for the path(s) in scope (see `.cursor/rules/README.md` for the glob map) and run `grep -rin 'keyword' .cursor/rules` when the topic is not covered by open files. Do not write code until you have read and are following every matching rule.
+- Record a convention only when the user explicitly asks for one. Instructions for the work at hand are not rules, no matter how emphatic: "remove this typo", "use X here" are work to do, not rules to record. Never record a rule on your own initiative, as a byproduct of a change, or to summarize what you just did. When the user does ask, create or edit the matching **`.cursor/rules/*.mdc`** with the correct `globs`, `description`, and a concise body (you may use Boost `record-rule` for drafting, then translate into `.mdc` — do not recreate `.ai/rules`).
 
 ## Artisan
 

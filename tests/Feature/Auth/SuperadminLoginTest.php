@@ -13,14 +13,13 @@ class SuperadminLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_screen_renders_hospital_branding_and_quick_fill_for_superadmin(): void
+    public function test_login_screen_renders_hospital_branding(): void
     {
         $response = $this->get('/login');
 
         $response->assertStatus(200);
         $response->assertSee('Rumah Sakit Sehat');
-        $response->assertSee('Akun Demo Superadmin');
-        $response->assertSee('superadmin');
+        $response->assertSee('Selamat datang');
     }
 
     public function test_superadmin_can_authenticate_using_username(): void
@@ -62,7 +61,7 @@ class SuperadminLoginTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
-    public function test_dashboard_greets_superadmin_with_name_and_role(): void
+    public function test_dashboard_shows_application_launcher_for_superadmin(): void
     {
         $superadmin = User::factory()->create([
             'name' => 'Super Administrator',
@@ -73,10 +72,11 @@ class SuperadminLoginTest extends TestCase
         $response = $this->actingAs($superadmin)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Selamat Datang,');
         $response->assertSee('Super Administrator');
-        $response->assertSee('Superadmin');
-        $response->assertSee('Modul Akses Cepat Superadmin');
+        $response->assertSee('Surgicon');
+        $response->assertSee('Angsmart');
+        $response->assertSee('ANSafe');
+        $response->assertSee(route('apps.surgicon.index'), false);
     }
 
     public function test_seeded_superadmin_can_login_directly(): void
